@@ -1,0 +1,326 @@
+/**
+ * beszelClient.ts — Thin fetch-based HTTP client for Beszel's PocketBase API.
+ *
+ * Design decisions (from design.md Auth Client section):
+ * - Authorization header: raw token, NO "Bearer" prefix (Beszel/PocketBase style).
+ * - Lazy re-auth on 401: clear cache → re-authenticate once → retry; second 401 → exit 2.
+ * - Token cache via tokenCache.ts; --no-cache bypasses read+write.
+ * - SUPPORTED_BESZEL version range: ">=0.18 <0.19"; out-of-range → warn on stderr, never throw.
+ * - Error mapping: auth 4xx → AUTH_FAILED exit 2; network/DNS/timeout → NETWORK_ERROR exit 4;
+ *   404 → NOT_FOUND exit 3; 5xx → NETWORK_ERROR exit 4.
+ *
+ * This module is Ink-free (REQ-2 boundary).
+ */
+
+import { CliError } from "../types/errors.js";
+import type { BeszelConfig } from "./config.js";
+import {
+  readCache,
+  writeCache,
+  clearCache,
+  decodeJwtExp,
+} from "./tokenCache.js";
+import type { CachedToken } from "./tokenCache.js";
+
+// ---------------------------------------------------------------------------
+// Version range
+// ---------------------------------------------------------------------------
+
+/**
+ * The single Beszel agent/hub version range this CLI is validated against.
+ * Out-of-range versions emit a stderr warning but never cause a non-zero exit.
+ */
+export const SUPPORTED_BESZEL = ">=0.18 <0.19";
+
+/**
+ * Check whether an observed agent/hub version string is within SUPPORTED_BESZEL.
+ * Uses a simple semver parse — only supports major.minor.patch (no pre-release).
+ *
+ * Out-of-range: warns on stderr, does NOT throw.
+ *
+ * @param observedVersion - The `v` field from systems.info (e.g. "0.18.7").
+ */
+export function checkVersion(observedVersion: string | undefined): void {
+  if (!observedVersion) return;
+
+  const match = observedVersion.match(/^(\d+)\.(\d+)\.(\d+)/);
+  if (!match) return;
+
+  const major = parseInt(match[1]!, 10);
+  const minor = parseInt(match[2]!, 10);
+
+  // SUPPORTED_BESZEL = ">=0.18 <0.19" means major==0 and minor==18.
+  const inRange = major === 0 && minor === 18;
+  if (!inRange) {
+    process.stderr.write(
+      `[beszel] WARNING: agent version ${observedVersion} is outside the supported range ${SUPPORTED_BESZEL}. ` +
+        `Output fields may differ from documented shapes.\n`,
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// PocketBase list query options
+// ---------------------------------------------------------------------------
+
+export interface ListOptions {
+  filter?: string;
+  sort?: string;
+  fields?: string;
+  perPage?: number;
+  page?: number;
+  /** When true, PocketBase skips the COUNT query (faster for large collections). */
+  skipTotal?: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// PocketBase auth response shape (minimal — only what we need)
+// ---------------------------------------------------------------------------
+
+interface AuthResponse {
+  token: string;
+  record?: {
+    id?: string;
+    email?: string;
+  };
+}
+
+// ---------------------------------------------------------------------------
+// BeszelClient
+// ---------------------------------------------------------------------------
+
+export class BeszelClient {
+  private readonly config: BeszelConfig;
+  private readonly noCache: boolean;
+  private token: string | null = null;
+
+  constructor(config: BeszelConfig, noCache = false) {
+    this.config = config;
+    this.noCache = noCache;
+  }
+
+  // -------------------------------------------------------------------------
+  // authenticate — obtain a valid token (from cache or fresh login)
+  // -------------------------------------------------------------------------
+
+  /**
+   * Ensure we have a valid token. If the cache holds a non-expired token
+   * scoped to the current url/collection/email, it is reused. Otherwise,
+   * a fresh auth call is made and the result is cached.
+   *
+   * @throws {CliError} AUTH_FAILED if credentials are rejected.
+   * @throws {CliError} NETWORK_ERROR if the auth endpoint is unreachable.
+   */
+  async authenticate(): Promise<string> {
+    // 1. Try the cache first.
+    const cached = readCache({
+      noCache: this.noCache,
+      url: this.config.url,
+      collection: this.config.authCollection,
+      email: this.config.email,
+    });
+
+    if (cached) {
+      this.token = cached.token;
+      return this.token;
+    }
+
+    // 2. Fresh auth call.
+    this.token = await this.doAuthenticate();
+    return this.token;
+  }
+
+  // -------------------------------------------------------------------------
+  // doAuthenticate — make the actual POST request
+  // -------------------------------------------------------------------------
+
+  private async doAuthenticate(): Promise<string> {
+    const url = `${this.config.url}/api/collections/${this.config.authCollection}/auth-with-password`;
+    const body = JSON.stringify({
+      identity: this.config.email,
+      password: this.config.password,
+    });
+
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body,
+      });
+    } catch (err) {
+      // fetch threw — network/DNS/timeout error.
+      throw new CliError(
+        "NETWORK_ERROR",
+        `Unable to reach Beszel hub at ${this.config.url}: ${(err as Error).message}`,
+        `Check that BESZEL_URL is reachable and the server is running.`,
+      );
+    }
+
+    if (response.status === 400 || response.status === 401) {
+      throw new CliError(
+        "AUTH_FAILED",
+        `Authentication failed (HTTP ${response.status}). Check BESZEL_EMAIL and BESZEL_PASSWORD.`,
+        `Verify your credentials and that BESZEL_AUTH_COLLECTION matches the user type.`,
+      );
+    }
+
+    if (!response.ok) {
+      // 5xx or unexpected error.
+      throw new CliError(
+        "NETWORK_ERROR",
+        `Beszel hub returned HTTP ${response.status} during authentication.`,
+        `Check the server logs at ${this.config.url}.`,
+      );
+    }
+
+    let data: AuthResponse;
+    try {
+      data = (await response.json()) as AuthResponse;
+    } catch {
+      throw new CliError(
+        "NETWORK_ERROR",
+        `Beszel hub returned a non-JSON auth response.`,
+        `This may indicate a proxy or firewall intercepting the request.`,
+      );
+    }
+
+    if (!data.token) {
+      throw new CliError(
+        "AUTH_FAILED",
+        `Beszel hub auth response did not include a token.`,
+        `Check that the auth collection is correct.`,
+      );
+    }
+
+    // Decode JWT exp for cache; if decoding fails exp=0 → not cached (safe).
+    const exp = decodeJwtExp(data.token);
+    const entry: CachedToken = {
+      token: data.token,
+      exp,
+      url: this.config.url,
+      collection: this.config.authCollection,
+      email: this.config.email,
+    };
+    writeCache(entry, this.noCache);
+
+    return data.token;
+  }
+
+  // -------------------------------------------------------------------------
+  // request — authenticated GET with lazy 401 re-auth
+  // -------------------------------------------------------------------------
+
+  /**
+   * Make an authenticated GET request. On 401, clears the cache, re-auths
+   * once, and retries. A second 401 throws AUTH_FAILED exit 2.
+   *
+   * @param path - Path relative to the hub URL (must start with /).
+   * @param isRetry - Internal flag — prevents infinite retry loops.
+   */
+  async request<T = unknown>(path: string, isRetry = false): Promise<T> {
+    if (!this.token) {
+      await this.authenticate();
+    }
+
+    const url = `${this.config.url}${path}`;
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        headers: {
+          // Beszel/PocketBase style: raw token, NO "Bearer" prefix.
+          Authorization: this.token!,
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (err) {
+      throw new CliError(
+        "NETWORK_ERROR",
+        `Network error reaching ${url}: ${(err as Error).message}`,
+        `Check connectivity and that BESZEL_URL is correct.`,
+      );
+    }
+
+    if (response.status === 401) {
+      if (isRetry) {
+        // Second 401 after re-auth — bail out.
+        throw new CliError(
+          "AUTH_FAILED",
+          `Authentication failed on retry (HTTP 401). Session may have expired.`,
+          `Try clearing the token cache or re-checking credentials.`,
+        );
+      }
+      // Clear stale token and re-authenticate once.
+      clearCache();
+      this.token = await this.doAuthenticate();
+      return this.request<T>(path, true);
+    }
+
+    if (response.status === 404) {
+      throw new CliError(
+        "NOT_FOUND",
+        `Resource not found: ${path}`,
+        `Check the collection name and that the resource exists.`,
+      );
+    }
+
+    if (!response.ok) {
+      throw new CliError(
+        "NETWORK_ERROR",
+        `Beszel hub returned HTTP ${response.status} for ${path}`,
+        `Check the server logs at ${this.config.url}.`,
+      );
+    }
+
+    try {
+      return (await response.json()) as T;
+    } catch {
+      throw new CliError(
+        "NETWORK_ERROR",
+        `Beszel hub returned a non-JSON response for ${path}`,
+        `This may indicate a proxy or firewall intercepting the request.`,
+      );
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // listRecords — build PocketBase query string + GET /api/collections/{c}/records
+  // -------------------------------------------------------------------------
+
+  /**
+   * Fetch a page of records from a PocketBase collection, applying optional
+   * filter, sort, fields, pagination, and skipTotal parameters.
+   *
+   * @param collection - PocketBase collection name.
+   * @param opts - Query options.
+   */
+  async listRecords<T = unknown>(collection: string, opts: ListOptions = {}): Promise<T> {
+    const params = new URLSearchParams();
+
+    if (opts.filter !== undefined) params.set("filter", opts.filter);
+    if (opts.sort !== undefined) params.set("sort", opts.sort);
+    if (opts.fields !== undefined) params.set("fields", opts.fields);
+    if (opts.perPage !== undefined) params.set("perPage", String(opts.perPage));
+    if (opts.page !== undefined) params.set("page", String(opts.page));
+    if (opts.skipTotal === true) params.set("skipTotal", "1");
+
+    const qs = params.toString();
+    const path = `/api/collections/${collection}/records${qs ? `?${qs}` : ""}`;
+
+    return this.request<T>(path);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Factory helper — creates a fully-authenticated client in one call
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a {@link BeszelClient} from config and ensure a valid token is
+ * loaded before returning. Callers can immediately call `listRecords()`.
+ */
+export async function createClient(config: BeszelConfig, noCache = false): Promise<BeszelClient> {
+  const client = new BeszelClient(config, noCache);
+  await client.authenticate();
+  return client;
+}
