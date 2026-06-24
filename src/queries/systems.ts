@@ -12,6 +12,7 @@
  */
 
 import type { BeszelClient } from "../client/beszelClient.js";
+import { checkVersion } from "../client/beszelClient.js";
 import { mapSystem } from "../mapping/key-map.js";
 import type { SystemItem, SystemsOutput } from "../types/output.js";
 import { PocketBaseListSchema, SystemRecordSchema } from "../types/upstream.js";
@@ -42,6 +43,13 @@ export async function fetchSystems(
   });
 
   const parsed = ListSchema.parse(raw);
+
+  // Check agent version against SUPPORTED_BESZEL on the first system encountered.
+  // Emits a stderr warning if out of range; never throws (design R5 / T-9.4).
+  if (parsed.items.length > 0) {
+    const firstVersion = parsed.items[0]!.info?.v;
+    checkVersion(firstVersion);
+  }
 
   let systems: SystemItem[] = parsed.items.map((record) => mapSystem(record));
 
