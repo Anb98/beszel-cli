@@ -9,6 +9,7 @@
  * REQ-9: --since adds HistoricalEnvelope<StatsPoint[]> to the response.
  *
  * This module is Ink-free (REQ-2 boundary). No static Ink/React import.
+ * The Ink renderer is loaded ONLY via dynamic import() inside the TTY branch.
  */
 
 import type { Command } from "commander";
@@ -16,8 +17,9 @@ import { loadConfig } from "../client/config.js";
 import { createClient } from "../client/beszelClient.js";
 import { fetchSystem } from "../queries/system.js";
 import { fetchStats } from "../queries/stats.js";
-import { emit, resolveMode } from "../utils/output.js";
+import { emit, resolveMode, type RenderCallback } from "../utils/output.js";
 import { handleError } from "../utils/errors.js";
+import type { SystemOutput } from "../types/output.js";
 
 // ---------------------------------------------------------------------------
 // registerSystem — attach the `system` subcommand to a Commander program
@@ -41,12 +43,18 @@ export function registerSystem(program: Command): void {
         const config = loadConfig();
         const client = await createClient(config, globalOpts.noCache ?? false);
 
+        // TTY renderer — loaded dynamically so Ink is never on the agent path.
+        const renderer: RenderCallback<SystemOutput> = async (data) => {
+          const { renderSystemDetail } = await import("../renderers/ink/SystemDetail.js");
+          await renderSystemDetail(data);
+        };
+
         // Fetch system snapshot + system_details.
         const systemResult = await fetchSystem(client, nameArg);
 
         if (!opts.since) {
           // No historical window — emit the snapshot directly.
-          await emit(systemResult, { json, noColor: globalOpts.noColor });
+          await emit(systemResult, { json, noColor: globalOpts.noColor, renderer });
           return;
         }
 
@@ -61,7 +69,10 @@ export function registerSystem(program: Command): void {
           history: statsEnvelope,
         };
 
-        await emit(result, { json, noColor: globalOpts.noColor });
+        // For historical data, renderer receives the extended object; the
+        // SystemDetail component handles the optional history field.
+        const rendererExtended = renderer as RenderCallback<typeof result>;
+        await emit(result, { json, noColor: globalOpts.noColor, renderer: rendererExtended });
       } catch (err) {
         handleError(err, { json });
       }

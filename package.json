@@ -35,6 +35,7 @@
     "@vitest/coverage-v8": "^4.1.9",
     "eslint": "9",
     "eslint-plugin-import": "^2.32.0",
+    "ink-testing-library": "^4.0.0",
     "msw": "^2.14.6",
     "tsup": "^8.5.1",
     "tsx": "^4.22.4",

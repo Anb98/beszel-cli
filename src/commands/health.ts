@@ -26,8 +26,9 @@ import { resolveThresholds } from "../health/thresholds.js";
 import { evaluateHealth, healthExitCode } from "../health/severity.js";
 import type { HealthSystem, HealthDevice } from "../health/severity.js";
 import type { SystemItem } from "../types/output.js";
-import { emit, resolveMode } from "../utils/output.js";
+import { emit, resolveMode, type RenderCallback } from "../utils/output.js";
 import { handleError } from "../utils/errors.js";
+import type { HealthReport as HealthReportData } from "../types/output.js";
 
 // ---------------------------------------------------------------------------
 // registerHealth — attach the `health` subcommand to a Commander program
@@ -119,7 +120,13 @@ export function registerHealth(program: Command): void {
           const report = evaluateHealth(healthSystems, healthDevices, thresholds);
           const exitCode = healthExitCode(report);
 
-          await emit(report, { json, noColor: globalOpts.noColor, exitCode });
+          // TTY renderer — loaded dynamically so Ink is never on the agent path.
+          const renderer: RenderCallback<HealthReportData> = async (data) => {
+            const { renderHealthReport } = await import("../renderers/ink/HealthReport.js");
+            await renderHealthReport(data);
+          };
+
+          await emit(report, { json, noColor: globalOpts.noColor, exitCode, renderer });
         } catch (err) {
           handleError(err, { json });
         }
