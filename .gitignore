@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment files
+.env
+.env.*
+*.local
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Test output / coverage
+coverage/
+.nyc_output/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary
+.cache/
+tmp/
+
+# Yarn — DO NOT ignore these (Berry requires them committed):
+# .yarn/releases/
+# .yarn/plugins/
+# .yarnrc.yml
+!.yarn/releases/
+!.yarn/plugins/
+!.yarnrc.yml
+
+# Yarn cache (not the releases)
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz

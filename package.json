@@ -1,0 +1,44 @@
+{
+  "name": "beszel-cli",
+  "version": "0.1.0",
+  "description": "Read-only Beszel monitoring CLI for humans and agents",
+  "type": "module",
+  "bin": {
+    "beszel": "./dist/cli.js"
+  },
+  "packageManager": "yarn@4.17.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx src/cli.ts",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "gen:skill": "tsx scripts/gen-skill.ts",
+    "check:skill": "tsx scripts/check-skill.ts"
+  },
+  "dependencies": {
+    "commander": "^15.0.0",
+    "ink": "5",
+    "react": "18",
+    "react-dom": "18",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "@types/react": "18",
+    "@typescript-eslint/eslint-plugin": "^8.62.0",
+    "@typescript-eslint/parser": "^8.62.0",
+    "@vitest/coverage-v8": "^4.1.9",
+    "eslint": "9",
+    "eslint-plugin-import": "^2.32.0",
+    "msw": "^2.14.6",
+    "tsup": "^8.5.1",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  }
+}
