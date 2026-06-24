@@ -1,0 +1,63 @@
+{
+  "page": 1,
+  "perPage": 30,
+  "totalItems": 3,
+  "totalPages": 1,
+  "items": [
+    {
+      "id": "sys001homela",
+      "name": "Home Lab",
+      "host": "homelab.local",
+      "status": "up",
+      "info": {
+        "cpu": 8.3,
+        "mp": 62.4,
+        "dp": 45.1,
+        "u": 1209600,
+        "v": "0.18.7",
+        "dt": 52.0,
+        "la": [0.82, 0.74, 0.68],
+        "ct": 12,
+        "efs": {
+          "md127": 32.05,
+          "md5": 7.89
+        }
+      },
+      "created": "2025-01-01T00:00:00.000Z",
+      "updated": "2026-06-24T14:00:00.000Z"
+    },
+    {
+      "id": "sys002orangpi",
+      "name": "OrangePi",
+      "host": "orangepi.local",
+      "status": "up",
+      "info": {
+        "cpu": 14.2,
+        "mp": 41.8,
+        "dp": 55.3,
+        "u": 432000,
+        "v": "0.18.7",
+        "dt": 41.0,
+        "la": [0.35, 0.42, 0.38],
+        "ct": 3
+      },
+      "created": "2025-02-01T00:00:00.000Z",
+      "updated": "2026-06-24T14:00:00.000Z"
+    },
+    {
+      "id": "sys003zimabld",
+      "name": "Zima blade",
+      "host": "zimablade.local",
+      "status": "up",
+      "info": {
+        "cpu": 3.1,
+        "mp": 28.5,
+        "dp": 22.7,
+        "u": 864000,
+        "v": "0.18.7"
+      },
+      "created": "2025-03-01T00:00:00.000Z",
+      "updated": "2026-06-24T14:00:00.000Z"
+    }
+  ]
+}

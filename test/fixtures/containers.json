@@ -1,0 +1,60 @@
+{
+  "page": 1,
+  "perPage": 50,
+  "totalItems": 4,
+  "totalPages": 1,
+  "items": [
+    {
+      "id": "con001nginx",
+      "name": "nginx",
+      "status": "Up 2 days",
+      "health": "healthy",
+      "cpu": 0.4,
+      "memory": 48.2,
+      "net": null,
+      "image": "nginx:latest",
+      "ports": "80/tcp, 443/tcp",
+      "system": "sys001homela",
+      "updated": 1750771200000
+    },
+    {
+      "id": "con002postg",
+      "name": "postgres",
+      "status": "Up 5 days",
+      "health": "healthy",
+      "cpu": 2.1,
+      "memory": 512.0,
+      "net": null,
+      "image": "postgres:15",
+      "ports": "5432/tcp",
+      "system": "sys001homela",
+      "updated": 1750771200000
+    },
+    {
+      "id": "con003redis",
+      "name": "redis",
+      "status": "Up 5 days",
+      "health": "healthy",
+      "cpu": 0.1,
+      "memory": 32.5,
+      "net": null,
+      "image": "redis:7-alpine",
+      "ports": "6379/tcp",
+      "system": "sys002orangpi",
+      "updated": 1750771200000
+    },
+    {
+      "id": "con004grafna",
+      "name": "grafana",
+      "status": "Up 1 day",
+      "health": "healthy",
+      "cpu": 1.8,
+      "memory": 256.3,
+      "net": null,
+      "image": "grafana/grafana:latest",
+      "ports": "3000/tcp",
+      "system": "sys002orangpi",
+      "updated": 1750771200000
+    }
+  ]
+}

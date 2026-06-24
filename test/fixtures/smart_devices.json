@@ -1,0 +1,57 @@
+{
+  "page": 1,
+  "perPage": 30,
+  "totalItems": 3,
+  "totalPages": 1,
+  "items": [
+    {
+      "id": "smart001md5",
+      "name": "/dev/md5",
+      "model": "Linux MD RAID (raid5)",
+      "state": "PASSED",
+      "type": "mdraid",
+      "attributes": [
+        { "n": "ArrayState", "rs": "clean" },
+        { "n": "RaidLevel", "rs": "raid5" },
+        { "n": "RaidDisks", "rv": 4 },
+        { "n": "SyncAction", "rs": "idle" },
+        { "n": "SyncCompleted" },
+        { "n": "SyncSpeed" }
+      ],
+      "system": "sys001homela",
+      "updated": "2026-06-24T14:00:00.000Z"
+    },
+    {
+      "id": "smart002sda",
+      "name": "/dev/sda",
+      "model": "Samsung SSD 870 EVO",
+      "serial": "S5GGNF0M123456",
+      "firmware": "SVT01B6Q",
+      "state": "PASSED",
+      "temp": 32,
+      "type": "sat",
+      "hours": 12480,
+      "cycles": 312,
+      "capacity": 2000398934016,
+      "attributes": [],
+      "system": "sys001homela",
+      "updated": "2026-06-24T14:00:00.000Z"
+    },
+    {
+      "id": "smart003nvme",
+      "name": "/dev/nvme0n1",
+      "model": "WD Black SN850X",
+      "serial": "WD-ABCDE12345",
+      "firmware": "620360WD",
+      "state": "PASSED",
+      "temp": 38,
+      "type": "nvme",
+      "hours": 4320,
+      "cycles": 89,
+      "capacity": 1000204886016,
+      "attributes": [],
+      "system": "sys001homela",
+      "updated": "2026-06-24T14:00:00.000Z"
+    }
+  ]
+}

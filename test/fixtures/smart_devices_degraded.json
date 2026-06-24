@@ -1,0 +1,41 @@
+{
+  "page": 1,
+  "perPage": 30,
+  "totalItems": 2,
+  "totalPages": 1,
+  "items": [
+    {
+      "id": "smart010md127",
+      "name": "/dev/md127",
+      "model": "Linux MD RAID (raid5)",
+      "state": "PASSED",
+      "type": "mdraid",
+      "attributes": [
+        { "n": "ArrayState", "rs": "degraded" },
+        { "n": "RaidLevel", "rs": "raid5" },
+        { "n": "RaidDisks", "rv": 4 },
+        { "n": "SyncAction", "rs": "recover" },
+        { "n": "SyncCompleted", "rs": "0%" },
+        { "n": "SyncSpeed" }
+      ],
+      "system": "sys001homela",
+      "updated": "2026-06-24T14:00:00.000Z"
+    },
+    {
+      "id": "smart011sdb",
+      "name": "/dev/sdb",
+      "model": "Seagate BarraCuda ST2000DM008",
+      "serial": "WFN3ABCD",
+      "firmware": "0001",
+      "state": "FAILED",
+      "temp": 41,
+      "type": "sat",
+      "hours": 36000,
+      "cycles": 1240,
+      "capacity": 2000398934016,
+      "attributes": [],
+      "system": "sys001homela",
+      "updated": "2026-06-24T14:00:00.000Z"
+    }
+  ]
+}
