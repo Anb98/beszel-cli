@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { parseDuration, selectInterval, resolveSince } from "../../src/queries/since.js";
+import { parseDuration, selectInterval, resolveSince, toPocketBaseDateTime } from "../../src/queries/since.js";
 import { CliError } from "../../src/types/errors.js";
 
 // ---------------------------------------------------------------------------
@@ -186,5 +186,38 @@ describe("resolveSince", () => {
     expect(() => new Date(result.to)).not.toThrow();
     expect(new Date(result.from).toISOString()).toBe(result.from);
     expect(new Date(result.to).toISOString()).toBe(result.to);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// toPocketBaseDateTime — regression test for BUG 2
+// PocketBase datetime filter requires space separator, not ISO "T".
+// PROVEN via live smoke test 2026-06-24: T-format → 0 rows; space → 37 rows.
+// ---------------------------------------------------------------------------
+
+describe("toPocketBaseDateTime", () => {
+  it("replaces T separator with a space, keeping millis and Z", () => {
+    expect(toPocketBaseDateTime("2026-06-24T17:00:00.000Z"))
+      .toBe("2026-06-24 17:00:00.000Z");
+  });
+
+  it("does not produce a T character in the output", () => {
+    const result = toPocketBaseDateTime("2026-06-24T17:00:00.000Z");
+    expect(result).not.toContain("T");
+  });
+
+  it("preserves the trailing Z", () => {
+    const result = toPocketBaseDateTime("2026-06-24T17:00:00.000Z");
+    expect(result.endsWith("Z")).toBe(true);
+  });
+
+  it("preserves milliseconds", () => {
+    expect(toPocketBaseDateTime("2026-01-01T00:00:00.123Z"))
+      .toBe("2026-01-01 00:00:00.123Z");
+  });
+
+  it("midnight boundary: 2026-06-24T00:00:00.000Z → 2026-06-24 00:00:00.000Z", () => {
+    expect(toPocketBaseDateTime("2026-06-24T00:00:00.000Z"))
+      .toBe("2026-06-24 00:00:00.000Z");
   });
 });

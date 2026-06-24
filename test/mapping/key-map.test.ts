@@ -214,7 +214,9 @@ describe("mapContainer — round-trip", () => {
     expect(result.name).toBe("nginx");
     expect(result.system).toBe("Home Lab");
     expect(result.status).toBe("Up 2 days");
-    expect(result.health).toBe("healthy");
+    // BUG 1 fix: health is a NUMBER in real Beszel API (e.g. 0), not a string.
+    // Fixture was updated 2026-06-24 to use numeric health values.
+    expect(result.health).toBe(0);
     expect(result.cpuPct).toBe(0.4);
     expect(result.memMB).toBe(48.2);
     expect(result.image).toBe("nginx:latest");

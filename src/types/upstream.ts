@@ -153,10 +153,20 @@ export const ContainerRecordSchema = z.looseObject({
   id: z.string(),
   name: z.string(),
   /** "Up 2 days" style string */ status: z.string().optional(),
-  health: z.string().optional(),
+  /**
+   * Health status — NUMBER in real Beszel API (e.g. 0).
+   * Bug fix: was incorrectly typed as z.string(); live smoke test confirmed
+   * Beszel returns a numeric health code, causing Zod invalid_type crash.
+   * provenance: live smoke test 2026-06-24; corrects earlier inferred schema.
+   */
+  health: z.number().optional(),
   /** cpu% */ cpu: z.number().optional(),
   /** mem MB */ memory: z.number().optional(),
-  /** net */ net: z.unknown().optional(),
+  /**
+   * net — NUMBER in real Beszel API (e.g. 3065 or 0).
+   * provenance: live recon #472; field stores numeric port/net value.
+   */
+  net: z.number().optional(),
   image: z.string().optional(),
   ports: z.string().optional(),
   /** parent system id */ system: z.string().optional(),

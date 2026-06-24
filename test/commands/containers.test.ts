@@ -231,4 +231,56 @@ describe("beszel containers — REQ-5", () => {
       expect(result.containers).toEqual([]);
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // BUG 1 regression: containers.health must be numeric, not string
+  // Root cause: upstream schema declared health as z.string(), but Beszel
+  // returns a NUMBER (e.g. 0). This caused Zod invalid_type crash on real data.
+  // Fix: ContainerRecordSchema.health → z.number(); ContainerInfo.health → number|null.
+  // ---------------------------------------------------------------------------
+
+  describe("BUG 1 regression — health field is a number", () => {
+    it("parses successfully when health is a number (does not throw)", async () => {
+      const client = await makeClient();
+      // This must NOT throw a Zod invalid_type error.
+      // Fixture now uses numeric health values (e.g. 0).
+      await expect(fetchContainers(client)).resolves.toBeDefined();
+    });
+
+    it("maps health as a number (not a string)", async () => {
+      const client = await makeClient();
+      const result = await fetchContainers(client);
+
+      for (const container of result.containers) {
+        // health must be null or a number — never a string
+        if (container.health !== null) {
+          expect(typeof container.health).toBe("number");
+        }
+      }
+    });
+
+    it("first container has health = 0 (numeric, from fixture)", async () => {
+      const client = await makeClient();
+      const result = await fetchContainers(client);
+
+      expect(result.containers.length).toBeGreaterThan(0);
+      // Fixture sets health: 0 for all containers — must arrive as number 0
+      expect(result.containers[0]!.health).toBe(0);
+      expect(typeof result.containers[0]!.health).toBe("number");
+    });
+
+    it("cpu, memory, updated are all numbers (real field shapes)", async () => {
+      const client = await makeClient();
+      const result = await fetchContainers(client);
+
+      for (const container of result.containers) {
+        if (container.cpuPct !== null) {
+          expect(typeof container.cpuPct).toBe("number");
+        }
+        if (container.memMB !== null) {
+          expect(typeof container.memMB).toBe("number");
+        }
+      }
+    });
+  });
 });

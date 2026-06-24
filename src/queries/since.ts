@@ -113,12 +113,48 @@ export function selectInterval(windowMs: number): IntervalBucket {
 // SinceResult — the resolved envelope metadata
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// toPocketBaseDateTime — convert ISO 8601 to PocketBase filter datetime format
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert an ISO 8601 datetime string to the PocketBase datetime filter format.
+ *
+ * PocketBase's `created >=` filter comparisons REQUIRE a space separator
+ * instead of the ISO 8601 `T` separator. The trailing `Z` and milliseconds
+ * are preserved. Milliseconds are kept for sub-second filter precision.
+ *
+ * PROVEN via live smoke test (2026-06-24): space-format → 37 rows returned;
+ * T-format → 0 rows returned on identical system/type/window queries.
+ *
+ * @example
+ *   toPocketBaseDateTime("2026-06-24T17:00:00.000Z")
+ *   // → "2026-06-24 17:00:00.000Z"
+ *
+ * @param iso - ISO 8601 string (e.g. from Date.toISOString()).
+ * @returns PocketBase filter datetime string with space separator.
+ */
+export function toPocketBaseDateTime(iso: string): string {
+  // Replace the literal "T" separator with a space.
+  // Input example:  "2026-06-24T17:00:00.000Z"
+  // Output example: "2026-06-24 17:00:00.000Z"
+  return iso.replace("T", " ");
+}
+
 export interface SinceResult {
   /** Selected interval bucket, e.g. "10m" */
   interval: IntervalBucket;
-  /** ISO 8601 start of window (now - window) */
+  /**
+   * ISO 8601 start of window (now - window).
+   * Use this for human/agent-facing output envelopes (from/to fields).
+   * For PocketBase filter strings, use toPocketBaseDateTime(from).
+   */
   from: string;
-  /** ISO 8601 end of window (now) */
+  /**
+   * ISO 8601 end of window (now).
+   * Use this for human/agent-facing output envelopes (from/to fields).
+   * For PocketBase filter strings, use toPocketBaseDateTime(to).
+   */
   to: string;
 }
 

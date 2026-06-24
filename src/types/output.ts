@@ -102,7 +102,12 @@ export interface ContainerInfo {
   /** parent system name */
   system: string;
   status: string | null;
-  health: string | null;
+  /**
+   * Health status code — NUMBER (e.g. 0).
+   * Bug fix: was incorrectly typed as string; Beszel returns a numeric health
+   * code. See upstream.ts ContainerRecordSchema fix (2026-06-24).
+   */
+  health: number | null;
   /** cpu% */
   cpuPct: number | null;
   /** mem MB */

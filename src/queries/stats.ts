@@ -27,7 +27,7 @@ import {
   SystemStatsRecordSchema,
   ContainerStatsRecordSchema,
 } from "../types/upstream.js";
-import { resolveSince, type SinceResult } from "./since.js";
+import { resolveSince, toPocketBaseDateTime, type SinceResult } from "./since.js";
 
 // ---------------------------------------------------------------------------
 // StatsOptions
@@ -87,9 +87,15 @@ export async function fetchStats(
 
   const SysStatsListSchema = PocketBaseListSchema(SystemStatsRecordSchema);
 
-  // PocketBase filter: system id, type=interval, created >= from ISO.
+  // PocketBase filter: system id, type=interval, created >= from.
   // system_stats DOES have `created` → sort by -created is valid.
-  const statsFilter = `system="${opts.systemId}" && type="${sinceResult.interval}" && created>="${sinceResult.from}"`;
+  //
+  // CRITICAL: PocketBase datetime filter comparisons require the SPACE format
+  // "YYYY-MM-DD HH:MM:SS.sssZ", NOT the ISO 8601 "T" format.
+  // Proven via live smoke test (2026-06-24): T-format returns 0 rows; space
+  // format returns expected rows on identical queries. toPocketBaseDateTime()
+  // is the centralized helper for this conversion.
+  const statsFilter = `system="${opts.systemId}" && type="${sinceResult.interval}" && created>="${toPocketBaseDateTime(sinceResult.from)}"`;
 
   const rawStats = await client.listRecords("system_stats", {
     filter: statsFilter,
@@ -109,7 +115,8 @@ export async function fetchStats(
   if (opts.includeContainers) {
     const ConStatsListSchema = PocketBaseListSchema(ContainerStatsRecordSchema);
 
-    const conFilter = `system="${opts.systemId}" && type="${sinceResult.interval}" && created>="${sinceResult.from}"`;
+    // Same PocketBase space-format datetime requirement as statsFilter above.
+    const conFilter = `system="${opts.systemId}" && type="${sinceResult.interval}" && created>="${toPocketBaseDateTime(sinceResult.from)}"`;
     const rawConStats = await client.listRecords("container_stats", {
       filter: conFilter,
       sort: "-created",
