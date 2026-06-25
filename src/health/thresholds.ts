@@ -1,27 +1,3 @@
-/**
- * health/thresholds.ts — Resolve health check thresholds.
- *
- * Precedence: flag > env (BESZEL_*) > default (design R2).
- *
- * Defaults (design R2 / decisions-resolved):
- *   disk%    > 90 → warn,  > 95 → crit
- *   temp     > 80 → warn,  > 90 → crit  (displayTempC + sensors)
- *   disk temp > 55 → warn, > 65 → crit  (smart_devices.tempC)
- *
- * Validation: crit >= warn else CliError(INVALID_THRESHOLD) exit 1.
- *
- * Flags (design R2):
- *   --disk-warn <pct>      / BESZEL_DISK_WARN
- *   --disk-crit <pct>      / BESZEL_DISK_CRIT
- *   --temp-warn <°C>       / BESZEL_TEMP_WARN
- *   --temp-crit <°C>       / BESZEL_TEMP_CRIT
- *   --disk-temp-warn <°C>  / BESZEL_DISK_TEMP_WARN
- *   --disk-temp-crit <°C>  / BESZEL_DISK_TEMP_CRIT
- *   --strict               / BESZEL_STRICT=1  (promotes all warn → crit)
- *
- * This module is Ink-free (REQ-2 boundary).
- */
-
 import { CliError } from "../types/errors.js";
 
 const DEFAULTS = {
@@ -54,19 +30,6 @@ export type Thresholds = {
   strict: boolean;
 };
 
-/**
- * Resolve health thresholds with precedence: flag > env > default.
- *
- * Reads BESZEL_DISK_WARN, BESZEL_DISK_CRIT, BESZEL_TEMP_WARN, BESZEL_TEMP_CRIT,
- * BESZEL_DISK_TEMP_WARN, BESZEL_DISK_TEMP_CRIT, BESZEL_STRICT from process.env
- * (or an injectable override via `env` parameter for testing).
- *
- * Throws CliError(INVALID_THRESHOLD) if any crit < warn after resolution.
- *
- * @param flags - Flag values from Commander (undefined = not provided).
- * @param env   - Environment variables (defaults to process.env; injectable for tests).
- * @returns Fully-resolved Thresholds object.
- */
 export function resolveThresholds(
   flags: ThresholdFlags = {},
   env: Record<string, string | undefined> = process.env,
@@ -98,9 +61,6 @@ export function resolveThresholds(
   return { diskWarn, diskCrit, tempWarn, tempCrit, diskTempWarn, diskTempCrit, strict };
 }
 
-/**
- * Resolve a single threshold value: flag > env-string-parsed > fallback.
- */
 function resolveNum(
   flag: number | undefined,
   envVal: string | undefined,
@@ -114,9 +74,6 @@ function resolveNum(
   return fallback;
 }
 
-/**
- * Validate that crit >= warn; throw CliError(INVALID_THRESHOLD) if not.
- */
 function validatePair(name: string, warn: number, crit: number): void {
   if (crit < warn) {
     throw new CliError(

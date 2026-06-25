@@ -1,14 +1,3 @@
-/**
- * commands/systems.ts — beszel systems command handler.
- *
- * REQ-3: List all fleet systems, optional --status filter.
- * Pipeline: loadConfig → createClient → fetchSystems → emit
- *
- * This module is Ink-free (REQ-2 boundary). No static Ink/React import.
- * The Ink renderer is loaded ONLY via dynamic import() inside the TTY branch
- * of emit() — never statically here.
- */
-
 import type { Command } from "commander";
 import { loadConfig } from "../client/config.js";
 import { createClient } from "../client/beszelClient.js";

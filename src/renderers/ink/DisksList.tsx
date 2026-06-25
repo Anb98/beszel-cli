@@ -1,10 +1,3 @@
-/**
- * renderers/ink/DisksList.tsx — Ink TUI renderer for `beszel disks`.
- *
- * REQ-2: Human/TTY path only. Dynamically imported from commands/disks.ts.
- * Groups devices by system. Colors RAID arrayState/syncAction. Marks failing disks.
- */
-
 import React from "react";
 import { Box, Text, render } from "ink";
 import type { DisksOutput, DeviceInfo, DiskInfo, RaidInfo } from "../../types/output.js";

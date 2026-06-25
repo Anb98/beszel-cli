@@ -1,10 +1,3 @@
-/**
- * since.test.ts — Tests for src/queries/since.ts
- *
- * REQ-9: duration parse, bucket selection, clamp+warn, and INVALID_DURATION.
- * All tests are pure-function; no HTTP mocking needed.
- */
-
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { parseDuration, selectInterval, resolveSince, toPocketBaseDateTime } from "../../src/queries/since.js";
 import { CliError } from "../../src/types/errors.js";
@@ -178,7 +171,7 @@ describe("resolveSince", () => {
 });
 
 // ---------------------------------------------------------------------------
-// toPocketBaseDateTime — regression test for BUG 2
+// toPocketBaseDateTime — regression test
 // PocketBase datetime filter requires space separator, not ISO "T".
 // PROVEN via live smoke test 2026-06-24: T-format → 0 rows; space → 37 rows.
 // ---------------------------------------------------------------------------

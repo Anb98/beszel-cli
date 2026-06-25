@@ -1,15 +1,3 @@
-/**
- * commands/containers.ts — beszel containers command handler.
- *
- * REQ-5: List containers with --top N, --sort cpu|memory, --system <name>.
- * REQ-9: Optional --since <dur> adds historical container stats.
- *
- * Pipeline: loadConfig → createClient → fetchContainers (+ fetchStats) → emit
- *
- * This module is Ink-free (REQ-2 boundary). No static Ink/React import.
- * The Ink renderer is loaded ONLY via dynamic import() inside the TTY branch.
- */
-
 import type { Command } from "commander";
 import { loadConfig } from "../client/config.js";
 import { createClient } from "../client/beszelClient.js";

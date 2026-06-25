@@ -1,14 +1,3 @@
-/**
- * key-map.test.ts — Unit tests for src/mapping/key-map.ts
- *
- * Covers (per T-1.6):
- * 1. Round-trip mapping tests: each mapper produces the correct canonical output
- * 2. Absent-field behavior: mandatory → null, optional → omitted
- * 3. Unknown-extra-key passthrough (REQ-10): Zod schemas tolerate unknown fields
- *
- * Tests MUST NOT hit a real Beszel instance.
- */
-
 import { describe, it, expect } from "vitest";
 import {
   mapSystem,
@@ -194,7 +183,7 @@ describe("mapContainer — round-trip", () => {
     expect(result.name).toBe("nginx");
     expect(result.system).toBe("Home Lab");
     expect(result.status).toBe("Up 2 days");
-    // BUG 1 fix: health is a NUMBER in real Beszel API (e.g. 0), not a string.
+    // health is a NUMBER in real Beszel API (e.g. 0), not a string.
     // Fixture was updated 2026-06-24 to use numeric health values.
     expect(result.health).toBe(0);
     expect(result.cpuPct).toBe(0.4);

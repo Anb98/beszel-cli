@@ -1,15 +1,3 @@
-/**
- * test/smoke/schema-resilience.test.ts — Schema resilience smoke tests.
- *
- * REQ-10: The Zod schemas and mappers must handle upstream objects with:
- *   (a) extra UNKNOWN keys — should be silently dropped, no throw
- *   (b) missing OPTIONAL keys — should produce null (stable) or omit (optional)
- *
- * All schemas use z.looseObject() (Zod 4 equivalent of .passthrough() at the
- * top level) so unknown keys are preserved in the parsed output but dropped
- * when mapped to canonical output types.
- */
-
 import { describe, it, expect } from "vitest";
 import {
   SystemRecordSchema,

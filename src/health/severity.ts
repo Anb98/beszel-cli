@@ -1,39 +1,6 @@
-/**
- * health/severity.ts — Evaluate fleet data into HealthIssue[] and HealthReport.
- *
- * Design rules (top-down first-match per device/system; design R1):
- *
- *   1. system status != "up"                              → CRITICAL kind:"down"
- *   2. SMART disk: state != "PASSED"                      → CRITICAL kind:"smart"
- *   3. RAID: state != "PASSED" OR arrayState ∈
- *      {degraded, failed, inactive}                       → CRITICAL kind:"raid"
- *   4. RAID: syncAction != "idle"                         → WARNING  kind:"raid"
- *   5. RAID: arrayState == "clean" && syncAction == "idle"→ OK (skip)
- *   6. disk% > diskCrit                                   → CRITICAL kind:"disk"
- *   7. disk% > diskWarn                                   → WARNING  kind:"disk"
- *   8. displayTempC or sensor > tempCrit                  → CRITICAL kind:"temp"
- *   9. displayTempC or sensor > tempWarn                  → WARNING  kind:"temp"
- *  10. smart_devices tempC > diskTempCrit                 → CRITICAL kind:"temp"
- *  11. smart_devices tempC > diskTempWarn                 → WARNING  kind:"temp"
- *
- * --strict (Thresholds.strict): promotes every "warn" to "crit" POST-aggregation.
- *
- * Exit semantics (R5):
- *   - any CRITICAL → exit 1 (healthExitCode returns 1)
- *   - warning-only → healthy:false but exit 0
- *   - no issues    → healthy:true, exit 0
- *
- * This module is Ink-free (REQ-2 boundary).
- * Input: plain data objects (already mapped from key-map). No BeszelClient calls.
- */
-
 import type { HealthIssue, HealthReport, HealthSeverity } from "../types/output.js";
 import type { Thresholds } from "./thresholds.js";
 
-/**
- * Minimal shape of a mapped system needed for health evaluation.
- * Accepts SystemItem from output types or a subset for testing.
- */
 export type HealthSystem = {
   name: string;
   status: string;
@@ -44,10 +11,6 @@ export type HealthSystem = {
   sensors?: Record<string, number>;
 };
 
-/**
- * Minimal shape of a mapped DeviceInfo needed for health evaluation.
- * Accepts DiskInfo or RaidInfo from output types.
- */
 export type HealthDevice = {
   /** system name */
   system: string;
@@ -64,14 +27,6 @@ export type HealthDevice = {
   syncAction?: string | null;
 };
 
-/**
- * Evaluate fleet health and return a HealthReport.
- *
- * @param systems  - Mapped system records (HealthSystem[]).
- * @param devices  - Mapped device records (HealthDevice[]). Pass [] when no SMART data.
- * @param thresholds - Resolved thresholds from resolveThresholds().
- * @returns HealthReport { healthy, issues, checked }.
- */
 export function evaluateHealth(
   systems: HealthSystem[],
   devices: HealthDevice[],
@@ -98,11 +53,6 @@ export function evaluateHealth(
   };
 }
 
-/**
- * Return the process exit code for a HealthReport.
- *   - 1 when any CRITICAL issue exists
- *   - 0 when healthy (no issues) or warning-only
- */
 export function healthExitCode(report: HealthReport): number {
   const hasCritical = report.issues.some((i) => i.severity === "crit");
   return hasCritical ? 1 : 0;
@@ -169,9 +119,6 @@ function collectDeviceIssues(
   }
 }
 
-/**
- * Evaluate disk usage percentage against diskWarn / diskCrit thresholds.
- */
 function evalDiskUsage(
   systemName: string,
   diskPct: number,
@@ -196,9 +143,6 @@ function evalDiskUsage(
   return null;
 }
 
-/**
- * Evaluate a RAID device (top-down first-match per design R1).
- */
 function evalRaid(device: HealthDevice, _thresholds: Thresholds): HealthIssue | null {
   if (
     device.state !== "PASSED" ||
@@ -239,9 +183,6 @@ function buildRaidDetail(device: HealthDevice): string {
   return parts.length > 0 ? parts.join(", ") : "RAID issue detected.";
 }
 
-/**
- * Evaluate a system or sensor temperature against tempWarn / tempCrit.
- */
 function evalTemp(
   systemName: string,
   label: string,
@@ -267,9 +208,6 @@ function evalTemp(
   return null;
 }
 
-/**
- * Evaluate a disk (SMART device) temperature against diskTempWarn / diskTempCrit.
- */
 function evalDiskTemp(
   systemName: string,
   celsius: number,

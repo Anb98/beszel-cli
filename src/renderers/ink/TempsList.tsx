@@ -1,10 +1,3 @@
-/**
- * renderers/ink/TempsList.tsx — Ink TUI renderer for `beszel temps`.
- *
- * REQ-2: Human/TTY path only. Dynamically imported from commands/temps.ts.
- * Shows per-system temperatures: displayTempC + per-sensor breakdown.
- */
-
 import React from "react";
 import { Box, Text, render } from "ink";
 import type { TempsOutput, TempInfo } from "../../types/output.js";
@@ -17,7 +10,7 @@ function useColor(): boolean {
  * Color-code a temperature reading against common thresholds.
  * Warn threshold: 80°C (system) / 55°C (disk). Crit: 90°C / 65°C.
  * We use generic thresholds here since we don't have the configured thresholds
- * at render time. Defaults match design R2.
+ * at render time. Defaults match the resolveThresholds() defaults.
  */
 function tempColor(celsius: number, colorEnabled: boolean, isDisk = false): string | undefined {
   if (!colorEnabled) return undefined;

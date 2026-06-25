@@ -1,27 +1,3 @@
-/**
- * commands/health.test.ts — Integration tests for src/commands/health.ts
- *
- * REQ-8 — all 9 scenarios covered end-to-end via evaluateHealth + healthExitCode:
- *
- *   S1: healthy fleet → healthy:true, issues:[], exit 0
- *   S2: system down → severity:crit, kind:down, exit 1
- *   S3: SMART failure → severity:crit, kind:smart, exit 1
- *   S4: RAID degraded → severity:crit, kind:raid, exit 1
- *   S5: RAID syncing → severity:warn, kind:raid, healthy:false, exit 0
- *   S6: disk usage WARNING → severity:warn, kind:disk, healthy:false, exit 0
- *   S7: temperature CRITICAL → severity:crit, kind:temp, exit 1
- *   S8: --strict promotes warning to critical → exit 1
- *   S9: custom threshold via flag → custom disk warn fires
- *
- * We test through the pure evaluateHealth() function (which is what the health
- * command wires together via fetchSystems + fetchDisks + fetchTemps). Each
- * scenario supplies the exact HealthSystem/HealthDevice arrays needed to trigger
- * the relevant rule, using the same fixtures the command would receive.
- *
- * For the full pipeline integration (fetchSystems + fetchDisks + fetchTemps →
- * evaluateHealth), additional tests use MSW to mock the HTTP layer.
- */
-
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";

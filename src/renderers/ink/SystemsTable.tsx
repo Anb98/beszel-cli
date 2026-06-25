@@ -1,12 +1,3 @@
-/**
- * renderers/ink/SystemsTable.tsx — Ink TUI renderer for `beszel systems`.
- *
- * REQ-2: Human/TTY path only. Never imported statically outside renderers/ink/.
- * --no-color: when process.env.NO_COLOR is set, color functions return plain text.
- *
- * Columns: name, status (colored), cpu%, mem%, disk%, temp, uptime, agent version.
- */
-
 import React from "react";
 import { Box, Text, render } from "ink";
 import type { SystemsOutput, SystemItem } from "../../types/output.js";

@@ -1,10 +1,3 @@
-/**
- * renderers/ink/ContainersList.tsx — Ink TUI renderer for `beszel containers`.
- *
- * REQ-2: Human/TTY path only. Dynamically imported from commands/containers.ts.
- * Groups containers by system; shows name, status, health code, cpu%, mem MB, image.
- */
-
 import React from "react";
 import { Box, Text, render } from "ink";
 import type { ContainersOutput, ContainerInfo } from "../../types/output.js";

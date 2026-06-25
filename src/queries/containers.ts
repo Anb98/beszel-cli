@@ -1,17 +1,3 @@
-/**
- * containers.ts — Fetch containers from Beszel, map to ContainerInfo[].
- *
- * REQ-5: list all containers; support --top N, --sort cpu|memory (server-side),
- * --system (resolve name→id, filter server-side).
- *
- * CRITICAL gotcha (live recon #472):
- *   The `containers` collection has NO `created` field.
- *   Sorting by `-created` returns HTTP 400. Sort by `updated` or by metric only.
- *   Server-side sort by `-cpu` / `-memory` is supported and used for --top.
- *
- * This module is Ink-free (REQ-2 boundary).
- */
-
 import type { BeszelClient } from "../client/beszelClient.js";
 import { mapContainer } from "../mapping/key-map.js";
 import type { ContainerInfo, ContainersOutput } from "../types/output.js";
@@ -31,13 +17,6 @@ export type ContainersOptions = {
   system?: string;
 };
 
-/**
- * Resolve a system name (case-insensitive) or id to a system id string.
- * Used for server-side filtering of the containers collection.
- *
- * @throws {CliError} NOT_FOUND if no system matches.
- * @throws {CliError} AMBIGUOUS_SYSTEM if multiple name matches.
- */
 async function resolveSystemId(
   client: BeszelClient,
   nameOrId: string,
@@ -82,21 +61,13 @@ async function resolveSystemId(
   );
 }
 
-/**
- * Fetch containers from the fleet, applying server-side sort and filter,
- * then mapping to ContainerInfo[].
- *
- * @param client - An authenticated BeszelClient.
- * @param opts - top, sort, system filter options.
- * @returns ContainersOutput envelope; empty array (never error) when none found.
- */
 export async function fetchContainers(
   client: BeszelClient,
   opts: ContainersOptions = {},
 ): Promise<ContainersOutput> {
   const ListSchema = PocketBaseListSchema(ContainerRecordSchema);
 
-  // NEVER sort by -created (containers collection has NO created field → HTTP 400).
+  // containers has no `created` field → sort by -updated, not -created.
   let sort = "-updated";
   if (opts.sort === "cpu") sort = "-cpu";
   else if (opts.sort === "memory") sort = "-memory";

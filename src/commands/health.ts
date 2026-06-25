@@ -1,21 +1,3 @@
-/**
- * commands/health.ts — beszel health command handler.
- *
- * REQ-8: Fleet health evaluation with configurable thresholds.
- * Gathers: systems + smart_devices (all systems) + temps sensors,
- * runs evaluateHealth(), emits HealthReport, sets exit code via healthExitCode().
- *
- * Threshold flags (design R2):
- *   --disk-warn, --disk-crit, --temp-warn, --temp-crit,
- *   --disk-temp-warn, --disk-temp-crit, --strict
- *
- * Exit codes (design R5):
- *   0 = healthy or warning-only fleet
- *   1 = any CRITICAL issue (or --strict with any warning)
- *
- * This module is Ink-free (REQ-2 boundary). No static Ink/React import.
- */
-
 import type { Command } from "commander";
 import { loadConfig } from "../client/config.js";
 import { createClient } from "../client/beszelClient.js";

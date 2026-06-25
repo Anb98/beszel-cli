@@ -1,11 +1,3 @@
-/**
- * containers.test.ts — Tests for src/queries/containers.ts
- *
- * REQ-5: list all containers; --top N; --sort cpu|memory (server-side);
- * --system filter; empty result returns [] (never error).
- * Uses msw to mock PocketBase API.
- */
-
 import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";

@@ -1,17 +1,3 @@
-/**
- * stats.test.ts — Regression tests for src/queries/stats.ts
- *
- * Regression: BUG 2 — PocketBase datetime filter format.
- * PocketBase `created >=` comparisons require the SPACE format
- * "YYYY-MM-DD HH:MM:SS.sssZ", NOT the ISO 8601 "T" format.
- *
- * PROVEN via live smoke test 2026-06-24: T-format → 0 rows returned;
- * space-format → 37 rows returned on identical system/type/window.
- *
- * These tests assert that fetchStats() builds filter strings with the
- * space-format datetime (not the T-format), ensuring the bug cannot recur.
- */
-
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";

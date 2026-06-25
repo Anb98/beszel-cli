@@ -1,10 +1,3 @@
-/**
- * system.test.ts — Tests for src/queries/system.ts
- *
- * REQ-4: system resolution (name, id, ambiguous, not-found), system_details merge.
- * Uses msw to mock PocketBase API; fixtures from test/fixtures/.
- */
-
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";

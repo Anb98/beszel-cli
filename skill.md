@@ -21,6 +21,10 @@ beszel health --json
 
 # List all systems
 beszel systems --json
+
+# Discover commands and flags
+beszel --help
+beszel <command> --help    # e.g. beszel health --help
 ```
 
 ---

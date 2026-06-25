@@ -1,10 +1,3 @@
-/**
- * thresholds.test.ts — Tests for src/health/thresholds.ts
- *
- * REQ-8 / design R2: threshold resolution precedence (flag > env > default)
- * and INVALID_THRESHOLD validation.
- */
-
 import { describe, it, expect } from "vitest";
 import { resolveThresholds } from "../../src/health/thresholds.js";
 import { CliError } from "../../src/types/errors.js";

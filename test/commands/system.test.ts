@@ -1,20 +1,3 @@
-/**
- * commands/system.test.ts — Integration tests for src/commands/system.ts
- *
- * REQ-4 scenarios tested:
- *   - Happy path: case-insensitive name resolution
- *   - ID fallback when no name matches
- *   - system_details merge (present and absent)
- *   - NOT_FOUND exit 3
- *   - AMBIGUOUS_SYSTEM exit 3
- *
- * REQ-9 scenarios tested:
- *   - --since adds a HistoricalEnvelope (history) to the output
- *
- * We test through the query layer (fetchSystem + fetchStats), which is the
- * canonical pipeline the command wires together.
- */
-
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";

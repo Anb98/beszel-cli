@@ -1,11 +1,3 @@
-/**
- * errors.ts — CliError class, ErrorCode union, error envelope shape,
- * and exit-code mapping.
- *
- * This is the SINGLE definition of machine-readable error codes and their
- * associated process exit codes (cross-cutting; see design exit-code table).
- */
-
 export type ErrorCode =
   /** Required env var missing (BESZEL_URL, EMAIL, PASSWORD) */
   | "CONFIG_MISSING"
@@ -51,10 +43,6 @@ export class CliError extends Error {
     Object.setPrototypeOf(this, new.target.prototype);
   }
 
-  /**
-   * Serialize to the stdout error envelope shape (REQ cross-cutting).
-   * {error: {code, message, hint}}
-   */
   toEnvelope(): ErrorEnvelope {
     return {
       error: {
@@ -74,10 +62,6 @@ export type ErrorEnvelope = {
   };
 };
 
-/**
- * Build the error envelope JSON string ready for process.stdout.write().
- * Diagnostic prose goes to stderr; this MUST be the only stdout output.
- */
 export function toErrorJson(error: CliError): string {
   return JSON.stringify(error.toEnvelope()) + "\n";
 }

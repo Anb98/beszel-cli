@@ -1,14 +1,3 @@
-/**
- * renderers/ink/HealthReport.tsx — Ink TUI renderer for `beszel health`.
- *
- * REQ-2: Human/TTY path only. Dynamically imported from commands/health.ts.
- *
- * Renders:
- *   - Green check + "Healthy" when healthy:true
- *   - Issues grouped by severity (crit=red, warn=yellow)
- *   - Summary line with system count checked
- */
-
 import React from "react";
 import { Box, Text, render } from "ink";
 import type { HealthReport as HealthReportData, HealthIssue, IssueSeverity } from "../../types/output.js";

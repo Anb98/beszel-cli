@@ -1,20 +1,3 @@
-/**
- * disks.ts — Fetch smart_devices for a system (or fleet), map to DeviceInfo[].
- *
- * REQ-6: unified DiskInfo / RaidInfo discriminated union.
- *   kind:"disk" — physical SMART devices (sat | nvme | scsi).
- *   kind:"raid" — md-RAID arrays (type==mdraid), with RAID attributes.
- *
- * --failing filter: state != "PASSED" (disks) OR arrayState != "clean" OR
- *   syncAction != "idle" (raid) — per design R1.
- *
- * CRITICAL gotcha (live recon #472):
- *   smart_devices has NO `created` field → sort by `updated` (autodate string).
- *   NEVER sort by -created on this collection → HTTP 400.
- *
- * This module is Ink-free (REQ-2 boundary).
- */
-
 import type { BeszelClient } from "../client/beszelClient.js";
 import { mapSmartDevice } from "../mapping/key-map.js";
 import type { DeviceInfo, DisksOutput, DiskInfo, RaidInfo } from "../types/output.js";
@@ -32,13 +15,6 @@ export type DisksOptions = {
   failing?: boolean;
 };
 
-/**
- * A device is "failing" when:
- *   - kind:"disk" → state != "PASSED" (or null → treat as unknown → failing)
- *   - kind:"raid" → arrayState != "clean" OR syncAction != "idle"
- *
- * Design R1: degraded raid is CRITICAL regardless of SMART `state`.
- */
 function isFailing(device: DeviceInfo): boolean {
   if (device.kind === "disk") {
     const d = device as DiskInfo;
@@ -89,13 +65,6 @@ async function resolveSystemId(
   );
 }
 
-/**
- * Fetch smart_devices for the fleet (or a single system), map to DeviceInfo[].
- *
- * @param client - An authenticated BeszelClient.
- * @param opts - system filter and failing flag.
- * @returns DisksOutput with a devices array; empty = no devices (never error).
- */
 export async function fetchDisks(
   client: BeszelClient,
   opts: DisksOptions = {},
@@ -124,7 +93,7 @@ export async function fetchDisks(
 
   const filter = filterParts.length > 0 ? filterParts.join(" && ") : undefined;
 
-  // Sort by -updated (smart_devices has NO created field → NEVER sort by -created).
+  // smart_devices has no `created` field → sort by -updated, not -created.
   const raw = await client.listRecords("smart_devices", {
     sort: "-updated",
     perPage: 500,

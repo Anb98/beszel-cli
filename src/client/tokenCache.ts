@@ -1,21 +1,3 @@
-/**
- * tokenCache.ts — Read/write the Beszel auth token from/to
- * ~/.cache/beszel-cli/token.json.
- *
- * REQ-1 token-cache requirements:
- * - Store {token, exp, url, collection, email} keyed to the endpoint so a
- *   cache from one hub cannot be replayed against another.
- * - Decode the JWT exp claim WITHOUT signature verification — only to gate
- *   reuse. A small clock-skew buffer (TOKEN_SKEW_MS) is applied: if exp is
- *   within the skew window the token is treated as expired.
- * - Cache directory: mode 0700; file: mode 0600.
- * - If --no-cache is set, both read and write are bypassed entirely.
- * - Any I/O error (permission denied, corrupt JSON, …) is silently treated as
- *   a cache miss so the caller falls back to a fresh auth call.
- *
- * This module is Ink-free (REQ-2 boundary).
- */
-
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -56,11 +38,6 @@ function getCacheDir(): string {
   return path.join(os.homedir(), ".cache", CACHE_DIR_NAME);
 }
 
-/**
- * Decode the `exp` claim from a JWT payload (middle segment) without
- * verifying the signature. Returns `0` if decoding fails so the token is
- * treated as expired and a fresh auth call is made.
- */
 export function decodeJwtExp(token: string): number {
   try {
     const parts = token.split(".");
@@ -77,24 +54,10 @@ export function decodeJwtExp(token: string): number {
   }
 }
 
-/**
- * Returns `true` if the token is still valid (not expired + skew buffer).
- * @param expUnixSeconds - The `exp` claim from the JWT (Unix seconds).
- */
 export function isTokenValid(expUnixSeconds: number): boolean {
   return expUnixSeconds * 1000 - TOKEN_SKEW_MS > Date.now();
 }
 
-/**
- * Read and validate the cached token. Returns `null` if:
- * - `noCache` is true
- * - the cache file does not exist
- * - JSON is corrupt
- * - the token is expired (within skew buffer)
- * - the stored url/collection/email does not match the current config
- *
- * Never throws; I/O errors are treated as cache misses.
- */
 export function readCache(opts: {
   noCache: boolean;
   url: string;
@@ -139,13 +102,6 @@ export function readCache(opts: {
   }
 }
 
-/**
- * Write a fresh token to the cache file (mode 0600). Creates the cache
- * directory (mode 0700) if it does not exist.
- *
- * Never throws; write failures are silently ignored so the auth flow
- * can continue without caching.
- */
 export function writeCache(entry: CachedToken, noCache: boolean): void {
   if (noCache) return;
 
@@ -162,12 +118,6 @@ export function writeCache(entry: CachedToken, noCache: boolean): void {
   }
 }
 
-/**
- * Remove the cached token file. Called when the server returns 401 so the
- * next auth attempt performs a fresh login.
- *
- * Never throws.
- */
 export function clearCache(): void {
   try {
     fs.unlinkSync(getCachePath());

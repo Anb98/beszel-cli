@@ -1,17 +1,3 @@
-/**
- * test/renderers/SystemsTable.test.tsx — Render smoke tests for SystemsTable.
- *
- * Uses ink-testing-library to render to a virtual stdout, then asserts that
- * key content appears in the rendered frame. These tests do NOT import Ink
- * into the core — they live in test/ and import renderers/ink/ directly.
- *
- * Coverage:
- *   - Header labels appear (NAME, STATUS, CPU, etc.)
- *   - System name, status, and metrics rendered for each row
- *   - Empty fleet renders "No systems found" message
- *   - Summary count line appears
- */
-
 import { describe, it, expect, afterEach } from "vitest";
 import React from "react";
 import { render, cleanup } from "ink-testing-library";

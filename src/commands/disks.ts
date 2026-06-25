@@ -1,14 +1,3 @@
-/**
- * commands/disks.ts — beszel disks command handler.
- *
- * REQ-6: Unified disk + RAID device listing. Optional --system and --failing.
- *
- * Pipeline: loadConfig → createClient → fetchDisks → emit
- *
- * This module is Ink-free (REQ-2 boundary). No static Ink/React import.
- * The Ink renderer is loaded ONLY via dynamic import() inside the TTY branch.
- */
-
 import type { Command } from "commander";
 import { loadConfig } from "../client/config.js";
 import { createClient } from "../client/beszelClient.js";

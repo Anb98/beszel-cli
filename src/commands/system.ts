@@ -1,17 +1,3 @@
-/**
- * commands/system.ts — beszel system <name|id> command handler.
- *
- * REQ-4: Resolve one system by name (case-insensitive) or id.
- *   - Optional --since <dur>: fetch historical stats via fetchStats().
- *   - Merges system_details (null when absent; never error).
- *   - NOT_FOUND / AMBIGUOUS_SYSTEM → exit 3.
- *
- * REQ-9: --since adds HistoricalEnvelope<StatsPoint[]> to the response.
- *
- * This module is Ink-free (REQ-2 boundary). No static Ink/React import.
- * The Ink renderer is loaded ONLY via dynamic import() inside the TTY branch.
- */
-
 import type { Command } from "commander";
 import { loadConfig } from "../client/config.js";
 import { createClient } from "../client/beszelClient.js";

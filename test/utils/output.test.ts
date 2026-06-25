@@ -1,17 +1,3 @@
-/**
- * output.test.ts — Tests for src/utils/output.ts
- *
- * REQ-2: dual-mode routing.
- * Tests do NOT import Ink. All coverage is pure Node.js.
- *
- * Covers:
- *   - resolveMode: --json forces JSON; piped (non-TTY) → JSON; CI env → JSON; TTY → tty
- *   - emit: JSON mode writes serialized JSON to stdout; sets exitCode
- *   - emit: TTY without renderer falls back to JSON (no crash)
- *   - emit: TTY with renderer calls renderer callback
- *   - emit: --no-color sets NO_COLOR env; correct exit codes
- */
-
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { resolveMode, emit } from "../../src/utils/output.js";
 

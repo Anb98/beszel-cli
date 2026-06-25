@@ -1,21 +1,3 @@
-/**
- * severity.test.ts — Tests for src/health/severity.ts
- *
- * Covers all 9 REQ-8 scenarios plus edge cases.
- * All tests are pure-function; no HTTP mocking needed.
- *
- * Scenarios covered:
- *  S1 — healthy fleet (all up, SMART PASSED, RAID clean+idle, disks < 90%, temps < 80°C)
- *  S2 — system down → CRITICAL kind:"down", exit 1
- *  S3 — SMART disk FAILED → CRITICAL kind:"smart", exit 1
- *  S4 — RAID degraded → CRITICAL kind:"raid", exit 1
- *  S5 — RAID syncing (clean+resync) → WARNING kind:"raid", healthy:false, exit 0
- *  S6 — disk usage warning only → WARNING kind:"disk", healthy:false, exit 0
- *  S7 — temperature CRITICAL → CRITICAL kind:"temp", exit 1
- *  S8 — --strict promotes warning to critical → exit 1
- *  S9 — custom threshold (--disk-warn 85, diskPct=87) → WARNING
- */
-
 import { describe, it, expect } from "vitest";
 import { evaluateHealth, healthExitCode } from "../../src/health/severity.js";
 import { resolveThresholds } from "../../src/health/thresholds.js";

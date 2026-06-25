@@ -1,14 +1,3 @@
-/**
- * scripts/check-skill.ts — CI staleness check for skill.md.
- *
- * Regenerates skill.md content in-memory and diffs it against the committed
- * file. Exits nonzero if stale (content mismatch) or missing.
- *
- * Usage:
- *   tsx scripts/check-skill.ts         (run as part of CI)
- *   yarn check:skill                   (npm script alias)
- */
-
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -139,6 +128,10 @@ beszel health --json
 
 # List all systems
 beszel systems --json
+
+# Discover commands and flags
+beszel --help
+beszel <command> --help    # e.g. beszel health --help
 \`\`\`
 
 ---

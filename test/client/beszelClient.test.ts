@@ -1,21 +1,3 @@
-/**
- * beszelClient.test.ts — Integration tests for src/client/beszelClient.ts
- *
- * Uses MSW (Mock Service Worker) node server to intercept fetch calls so
- * tests NEVER hit a real Beszel instance.
- *
- * Covers all REQ-1 scenarios:
- * - Successful auth + token returned and cached
- * - Cached-token reuse (no second auth call)
- * - Expired / --no-cache → fresh auth
- * - Auth failure (bad creds) → CliError AUTH_FAILED exit 2
- * - Network failure → CliError NETWORK_ERROR exit 4
- * - 401 mid-session → clears cache + re-auths once + retries
- * - 404 resource → CliError NOT_FOUND exit 3
- * - Custom auth collection used in URL
- * - checkVersion warns on stderr for out-of-range versions
- */
-
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";

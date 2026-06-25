@@ -1,13 +1,3 @@
-/**
- * commands/temps.test.ts — Integration tests for src/commands/temps.ts
- *
- * REQ-7 scenarios tested:
- *   - Happy path: displayTempC and sensors map present
- *   - --disks merges disk temps into the sensors map
- *   - System with no sensors (no t in system_stats) → sensors: {}
- *   - System without dt → displayTempC: null
- */
-
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";

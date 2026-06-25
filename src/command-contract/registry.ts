@@ -1,16 +1,3 @@
-/**
- * command-contract/registry.ts — Single source of truth for every beszel command.
- *
- * Purpose: documents the stable JSON contract for each command (name, purpose,
- * flags, JSON output shape, and field stability classification). Used by:
- *   - scripts/gen-skill.ts  → generates skill.md from this data
- *   - scripts/check-skill.ts → CI staleness check
- *
- * Field stability levels (REQ-10):
- *   STABLE    — always present in JSON output (may be null if upstream absent)
- *   OPTIONAL  — present only when upstream provides the source key; never null
- */
-
 export type FieldStability = "stable" | "optional";
 
 export type FieldDef = {

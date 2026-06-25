@@ -1,11 +1,3 @@
-/**
- * temps.test.ts — Tests for src/queries/temps.ts
- *
- * REQ-7: displayTempC, sensors map, --disks merges smart device temps,
- * no sensors → sensors={}.
- * Uses msw to mock PocketBase API.
- */
-
 import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";

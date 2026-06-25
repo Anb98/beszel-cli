@@ -35,6 +35,10 @@ export BESZEL_PASSWORD=secret
 ### 3. Run
 
 ```sh
+# Discover commands and flags
+beszel --help
+beszel <command> -h    # e.g. beszel health -h
+
 # Health check — exit 0 = ok, exit 1 = CRITICAL
 beszel health --json
 

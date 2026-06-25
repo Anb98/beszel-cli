@@ -1,10 +1,3 @@
-/**
- * config.test.ts — Unit tests for src/client/config.ts
- *
- * Covers REQ-1 scenario: missing env var → CONFIG_MISSING CliError exit 1.
- * Uses a plain in-process env override (no HTTP, no msw needed here).
- */
-
 import { describe, it, expect } from "vitest";
 import { loadConfig } from "../../src/client/config.js";
 import { CliError } from "../../src/types/errors.js";

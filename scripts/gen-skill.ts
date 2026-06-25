@@ -1,15 +1,3 @@
-/**
- * scripts/gen-skill.ts — Render skill.md from the command-contract registry.
- *
- * Usage: tsx scripts/gen-skill.ts          (writes skill.md at repo root)
- *        tsx scripts/gen-skill.ts --dry-run (print to stdout, do not write)
- *
- * Applies cognitive-doc-design principles:
- *   - Lead with the canonical command table (recognition over recall)
- *   - Progressive disclosure: command table → per-command detail → cross-cutting
- *   - Terse, agent-parseable tone: no marketing prose
- */
-
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -142,6 +130,10 @@ beszel health --json
 
 # List all systems
 beszel systems --json
+
+# Discover commands and flags
+beszel --help
+beszel <command> --help    # e.g. beszel health --help
 \`\`\`
 
 ---

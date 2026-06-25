@@ -1,14 +1,3 @@
-/**
- * commands/temps.ts — beszel temps command handler.
- *
- * REQ-7: Per-system temperature summary. Optional --disks merges disk temps.
- *
- * Pipeline: loadConfig → createClient → fetchTemps → emit
- *
- * This module is Ink-free (REQ-2 boundary). No static Ink/React import.
- * The Ink renderer is loaded ONLY via dynamic import() inside the TTY branch.
- */
-
 import type { Command } from "commander";
 import { loadConfig } from "../client/config.js";
 import { createClient } from "../client/beszelClient.js";

@@ -1,20 +1,3 @@
-/**
- * commands/systems.test.ts — Integration tests for src/commands/systems.ts
- *
- * REQ-3 scenarios tested end-to-end:
- *   - Happy path: 3 systems returned sorted by name ascending
- *   - Empty fleet → {systems: []}
- *   - Optional fields present (dt → tempC, ct → containerCount)
- *   - Optional fields absent (no dt → no tempC)
- *   - --status filter (server returns filtered list, command passes it through)
- *
- * Tests mock both the auth endpoint and the systems collection endpoint.
- * process.env is injected via BeszelConfig (noCache=true to skip disk I/O).
- * We test the QUERY + MAPPING layer end-to-end by calling fetchSystems(),
- * not the CLI entry (which would require spawn). Command-level integration is
- * tested via the query layer since the command is a thin wiring of query → emit.
- */
-
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";

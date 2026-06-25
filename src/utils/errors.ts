@@ -1,15 +1,3 @@
-/**
- * utils/errors.ts — Top-level error handler.
- *
- * Catches CliError (and unknown errors), produces the standard error envelope
- * {error:{code,message,hint}}, and maps to the correct exit code.
- *
- * In JSON/agent mode the envelope goes to STDOUT — the single-channel contract
- * for machine consumers (STDOUT must contain only the data or error envelope).
- * In TTY mode the envelope goes to STDERR so the terminal separates data from
- * diagnostics.
- */
-
 import { CliError, EXIT_CODES } from "../types/errors.js";
 import type { ErrorEnvelope } from "../types/output.js";
 
@@ -21,14 +9,6 @@ export type HandleErrorOptions = {
   json: boolean;
 };
 
-/**
- * Catch-all error handler. Call from the top-level CLI entry point after any
- * command throws.
- *
- * - Maps CliError → {error:{code,message,hint}} envelope.
- * - Maps unknown errors → INTERNAL_ERROR envelope.
- * - Sets process.exitCode (never calls process.exit() so the event loop drains).
- */
 export function handleError(err: unknown, opts: HandleErrorOptions): void {
   const envelope = buildEnvelope(err);
   const exitCode = resolveExitCode(err);

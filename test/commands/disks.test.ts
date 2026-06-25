@@ -1,15 +1,3 @@
-/**
- * commands/disks.test.ts — Integration tests for src/commands/disks.ts
- *
- * REQ-6 scenarios tested:
- *   - Mixed disk and RAID items returned with correct kind
- *   - RAID items include raidLevel, arrayState, raidDisks, syncAction
- *   - Host with no smart_devices → {devices:[]}
- *   - --failing filter: only failing items returned
- *   - RAID degraded detection (arrayState != "clean")
- *   - --system filter applies server-side
- */
-
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";

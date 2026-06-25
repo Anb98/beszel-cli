@@ -1,20 +1,3 @@
-/**
- * system.ts — Resolve and fetch a single system by name or id.
- *
- * REQ-4: Two-step lookup:
- *   1. Case-insensitive exact name match (all systems, compare lowercased).
- *   2. If zero name matches → exact id match.
- *   Multiple case-insensitive name matches → AMBIGUOUS_SYSTEM exit 3.
- *   Zero matches total → NOT_FOUND exit 3.
- *
- * Merges the live snapshot (systems record) with system_details.
- * system_details absent → details: null (never error; REQ-4).
- *
- * Design R3: case-INSENSITIVE overrides spec REQ-4 "case-sensitive" — friendlier.
- *
- * This module is Ink-free (REQ-2 boundary).
- */
-
 import type { BeszelClient } from "../client/beszelClient.js";
 import { mapSystemDetail, mapSystemDetailsInfo } from "../mapping/key-map.js";
 import type { SystemOutput } from "../types/output.js";
@@ -25,12 +8,6 @@ import {
 } from "../types/upstream.js";
 import { CliError } from "../types/errors.js";
 
-/**
- * Resolve a name-or-id argument to a single system record.
- *
- * @throws {CliError} AMBIGUOUS_SYSTEM (exit 3) if multiple systems share the name (case-insensitive).
- * @throws {CliError} NOT_FOUND (exit 3) if no name or id match.
- */
 async function resolveSystem(
   client: BeszelClient,
   nameOrId: string,
@@ -74,13 +51,6 @@ async function resolveSystem(
   );
 }
 
-/**
- * Fetch one system by name or id, merging the live snapshot with system_details.
- *
- * @param client - An authenticated BeszelClient.
- * @param nameOrId - System name (case-insensitive) or exact id.
- * @returns SystemOutput with `system` (snapshot) and `details` (hardware info or null).
- */
 export async function fetchSystem(
   client: BeszelClient,
   nameOrId: string,
@@ -88,7 +58,7 @@ export async function fetchSystem(
   const record = await resolveSystem(client, nameOrId);
   const system = mapSystemDetail(record);
 
-  // system_details id == system id (verified via live recon #472).
+  // system_details id == system id.
   const DetailsListSchema = PocketBaseListSchema(SystemDetailsRecordSchema);
 
   let details: SystemOutput["details"] = null;

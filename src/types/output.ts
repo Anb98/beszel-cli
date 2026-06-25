@@ -1,15 +1,3 @@
-/**
- * output.ts — Canonical output types the CLI emits.
- *
- * These are the STABLE JSON contract shapes (REQ-3 through REQ-9).
- * Field names here are human-readable. The mapping from abbreviated upstream
- * keys to these names lives exclusively in src/mapping/key-map.ts (REQ-12).
- *
- * Stable-mandatory fields: always present (may be null if upstream is absent).
- * Optional fields: present only when the upstream snapshot includes the source key.
- */
-
-/** System lifecycle state reported by the Beszel agent. */
 export type SystemStatus = "up" | "down" | "paused" | "pending";
 
 /** Discriminant for the DiskInfo / RaidInfo union. */
@@ -27,25 +15,25 @@ export type StatsInterval = "1m" | "10m" | "20m" | "120m" | "480m";
 /**
  * SMART overall state string from Beszel.
  * Known values + open union so new values from future agent releases pass through
- * without breaking the schema (REQ-10).
+ * without breaking the schema.
  */
 export type SmartState = "PASSED" | "FAILED" | "UNKNOWN" | (string & {});
 
 /**
  * Physical disk protocol type from Beszel smart_devices.type.
- * Open union — Beszel may add new types across versions (REQ-10).
+ * Open union — Beszel may add new types across versions.
  */
 export type DiskType = "sat" | "nvme" | "scsi" | "emmc" | "mdraid" | (string & {});
 
 /**
  * md-RAID array state string from ArrayState attribute.
- * Open union — Beszel may add new states across versions (REQ-10).
+ * Open union — Beszel may add new states across versions.
  */
 export type RaidArrayState = "clean" | "degraded" | "failed" | "inactive" | "write-pending" | (string & {});
 
 /**
  * md-RAID sync action string from SyncAction attribute.
- * Open union — Beszel may add new actions across versions (REQ-10).
+ * Open union — Beszel may add new actions across versions.
  */
 export type RaidSyncAction = "idle" | "resync" | "recover" | "recovery" | "check" | "repair" | "reshape" | (string & {});
 

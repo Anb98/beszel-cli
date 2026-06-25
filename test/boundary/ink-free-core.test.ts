@@ -1,14 +1,3 @@
-/**
- * test/boundary/ink-free-core.test.ts — Static dependency-graph boundary assertion.
- *
- * REQ-2: The Ink-free data core (client, queries, types, mapping, health, utils)
- * MUST contain NO static `from 'ink'` or `from 'react'` import (and no dynamic
- * import of them either).
- *
- * This test scans the source text of every .ts file in the boundary directories
- * and fails loudly if any ink or react import is found.
- */
-
 import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
@@ -96,7 +85,7 @@ describe("Ink-free core boundary", () => {
       if (allViolations.length > 0) {
         throw new Error(
           `Ink/React boundary violation in core modules:\n\n${allViolations.join("\n\n")}\n\n` +
-            `These directories must remain Ink-free (REQ-2). ` +
+            `These directories must remain Ink-free. ` +
             `Use dynamic import() ONLY inside renderers/ink/ components.`,
         );
       }
@@ -131,7 +120,7 @@ describe("Ink-free core boundary", () => {
     if (allViolations.length > 0) {
       throw new Error(
         `Static Ink/React import in commands/:\n\n${allViolations.join("\n")}\n\n` +
-          `Commands may only use dynamic import() for renderer callbacks (REQ-2).`,
+          `Commands may only use dynamic import() for renderer callbacks.`,
       );
     }
   });

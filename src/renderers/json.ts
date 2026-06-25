@@ -1,26 +1,3 @@
-/**
- * renderers/json.ts — Pure JSON serialization helper for the agent/pipe output path.
- *
- * This module has NO Ink or React dependency. It is the only renderer that runs
- * on the non-TTY path and is always safe to import from any module (including
- * those under the Ink-free boundary).
- *
- * Design note: stable key ordering is applied via a custom replacer to make
- * output predictable for snapshot tests and diffing. The ordering groups
- * structural/identity keys first, then domain-specific fields, with unknown
- * extra keys appended last.
- */
-
-/**
- * Serialize a value to a pretty-printed JSON string (2-space indent).
- *
- * Applies a stable key ordering so that structural keys (id, name, kind,
- * status, healthy, issues, checked, error) always appear first, making diffs
- * and snapshot tests readable.
- *
- * @param data - Any JSON-serializable value.
- * @returns Newline-terminated JSON string.
- */
 export function serializeJson(data: unknown): string {
   return JSON.stringify(data, stableReplacer(), 2) + "\n";
 }

@@ -1,14 +1,3 @@
-/**
- * config.ts — Load and validate environment variables for the Beszel CLI.
- *
- * REQ-1: Reads BESZEL_URL, BESZEL_EMAIL, BESZEL_PASSWORD (required) and
- * BESZEL_AUTH_COLLECTION (optional, defaults to "_superusers"). Any missing or
- * invalid required variable throws a CliError with code CONFIG_MISSING so the
- * caller can emit the error envelope and exit 1.
- *
- * This module is Ink-free (REQ-2 boundary).
- */
-
 import { z } from "zod";
 import { CliError } from "../types/errors.js";
 
@@ -36,15 +25,6 @@ export type BeszelConfig = {
   authCollection: string;
 };
 
-/**
- * Reads the four Beszel env vars from `process.env` (or an override map for
- * testing), validates them with Zod, and returns a typed {@link BeszelConfig}.
- *
- * Throws a {@link CliError} with code `CONFIG_MISSING` if any required var is
- * absent or invalid. The caller should catch this and emit the error envelope.
- *
- * @param env - Optional override; defaults to `process.env`.
- */
 export function loadConfig(env: Record<string, string | undefined> = process.env): BeszelConfig {
   const result = ConfigSchema.safeParse(env);
 

@@ -1,16 +1,3 @@
-/**
- * test/renderers/HealthReport.test.tsx — Render smoke tests for HealthReport.
- *
- * Uses ink-testing-library to render to a virtual stdout.
- * Tests do NOT import Ink into the core.
- *
- * Coverage:
- *   - Healthy fleet: "Healthy" appears, no issue blocks
- *   - Unhealthy fleet with CRITICAL: "CRITICAL" section, issue details visible
- *   - Warning-only fleet: "WARNINGS" section appears, no CRITICAL section
- *   - Checked count appears in output
- */
-
 import { describe, it, expect, afterEach } from "vitest";
 import React from "react";
 import { render, cleanup } from "ink-testing-library";

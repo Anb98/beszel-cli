@@ -1,13 +1,3 @@
-/**
- * upstream.ts — Zod schemas mirroring real Beszel PocketBase collections.
- *
- * AUTHORITATIVE shapes from live recon (sdd/beszel-query-cli/live-schema #472),
- * Beszel agents v0.18.7. All schemas use z.looseObject() (Zod 4 idiom) so that
- * unknown upstream fields never cause parse failures (REQ-10 schema resilience).
- * Abbreviated keys are used here intentionally — key-map.ts is the ONLY place
- * that translates them to canonical output names (REQ-12).
- */
-
 import { z } from "zod";
 
 /**
@@ -23,8 +13,8 @@ const AutoDateSchema = z.string();
 const UnixMsSchema = z.number();
 
 // ---------------------------------------------------------------------------
-// systems.info snapshot — abbreviated keys from live recon v0.18.7
-// provenance: undocumented; discovered via live recon (#472)
+// systems.info snapshot — abbreviated keys from Beszel v0.18.7
+// provenance: undocumented Beszel fields; discovered empirically
 // ---------------------------------------------------------------------------
 
 export const SystemInfoSchema = z.looseObject({
@@ -145,7 +135,7 @@ export const ContainerRecordSchema = z.looseObject({
   /** mem MB */ memory: z.number().optional(),
   /**
    * net — NUMBER in real Beszel API (e.g. 3065 or 0).
-   * provenance: live recon #472; field stores numeric port/net value.
+   * provenance: undocumented Beszel field; field stores numeric port/net value.
    */
   net: z.number().optional(),
   image: z.string().optional(),

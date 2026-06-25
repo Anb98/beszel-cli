@@ -1,25 +1,7 @@
-/**
- * test/boundary/key-map-centralization.test.ts — Key-map centralization assertion.
- *
- * REQ-12: Abbreviated upstream keys (mp, dp, dt, efs, u, v, ct, la, c, m, n, b,
- * t, mu, du, dw, mb, etc.) must appear ONLY in src/mapping/key-map.ts.
- * No other source file outside key-map.ts may contain these string literals as
- * property accesses (e.g. `.mp`, `["mp"]`, `record.mp`).
- *
- * Strategy: scan all .ts files in src/ EXCEPT src/mapping/key-map.ts and
- * src/types/upstream.ts (which intentionally declares the abbreviated schema)
- * for property-access patterns on the known abbreviated keys.
- */
-
 import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 
-/**
- * These are the abbreviated upstream field names from Beszel's PocketBase API
- * (provenance: live recon #472, Beszel v0.18.7 — undocumented).
- * They must be translated in key-map.ts ONLY; never accessed directly elsewhere.
- */
 const ABBREVIATED_KEYS = [
   // systems.info abbreviated keys
   "mp",  // → memPct
@@ -140,7 +122,7 @@ describe("Key-map centralization boundary", () => {
 
     if (violations.length > 0) {
       throw new Error(
-        `Key-map centralization violation (REQ-12):\n\n${violations.join("\n\n")}\n\n` +
+        `Key-map centralization violation:\n\n${violations.join("\n\n")}\n\n` +
           `Abbreviated upstream keys must only be accessed in src/mapping/key-map.ts. ` +
           `Other modules must use canonical output field names only.`,
       );

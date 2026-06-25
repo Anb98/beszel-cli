@@ -1,16 +1,3 @@
-/**
- * commands/containers.test.ts — Integration tests for src/commands/containers.ts
- *
- * REQ-5 scenarios tested:
- *   - Happy path: all containers listed with required fields
- *   - --top N limits results
- *   - --sort cpu|memory changes sort field
- *   - --system filter restricts to one system
- *   - Empty result → {containers:[]}
- *
- * REQ-9: --since on containers (not tested here; since.test.ts covers bucket logic)
- */
-
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
@@ -221,7 +208,7 @@ describe("beszel containers — REQ-5", () => {
   });
 
   // ---------------------------------------------------------------------------
-  // BUG 1 regression: containers.health must be numeric, not string
+  // Regression: containers.health must be numeric, not string
   // Root cause: upstream schema declared health as z.string(), but Beszel
   // returns a NUMBER (e.g. 0). This caused Zod invalid_type crash on real data.
   // Fix: ContainerRecordSchema.health → z.number(); ContainerInfo.health → number|null.

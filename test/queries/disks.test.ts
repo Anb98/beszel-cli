@@ -1,11 +1,3 @@
-/**
- * disks.test.ts — Tests for src/queries/disks.ts
- *
- * REQ-6: unified DiskInfo/RaidInfo discriminated union; --failing filter;
- * no devices → empty array (never error); RAID attribute parsing.
- * Uses msw to mock PocketBase API.
- */
-
 import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";

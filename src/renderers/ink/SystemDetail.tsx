@@ -1,13 +1,3 @@
-/**
- * renderers/ink/SystemDetail.tsx — Ink TUI renderer for `beszel system <name>`.
- *
- * REQ-2: Human/TTY path only. Dynamically imported; never statically imported
- * outside renderers/ink/.
- *
- * Renders: system snapshot fields + system_details hardware info.
- * Optional: history section when --since is used.
- */
-
 import React from "react";
 import { Box, Text, render } from "ink";
 import type { SystemOutput, HistoricalEnvelope } from "../../types/output.js";

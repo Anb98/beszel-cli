@@ -1,12 +1,3 @@
-/**
- * cli.ts — Commander wiring entry point for beszel.
- *
- * Each sub-command module owns its own pipeline:
- *   loadConfig → createClient → fetch → emit → handleError
- *
- * Commands set process.exitCode (never process.exit()) so the event loop drains.
- */
-
 import { createRequire } from "module";
 import { Command } from "commander";
 

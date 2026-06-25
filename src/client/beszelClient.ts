@@ -1,17 +1,3 @@
-/**
- * beszelClient.ts — Thin fetch-based HTTP client for Beszel's PocketBase API.
- *
- * Design decisions (from design.md Auth Client section):
- * - Authorization header: raw token, NO "Bearer" prefix (Beszel/PocketBase style).
- * - Lazy re-auth on 401: clear cache → re-authenticate once → retry; second 401 → exit 2.
- * - Token cache via tokenCache.ts; --no-cache bypasses read+write.
- * - SUPPORTED_BESZEL version range: ">=0.18 <0.19"; out-of-range → warn on stderr, never throw.
- * - Error mapping: auth 4xx → AUTH_FAILED exit 2; network/DNS/timeout → NETWORK_ERROR exit 4;
- *   404 → NOT_FOUND exit 3; 5xx → NETWORK_ERROR exit 4.
- *
- * This module is Ink-free (REQ-2 boundary).
- */
-
 import { CliError } from "../types/errors.js";
 import type { BeszelConfig } from "./config.js";
 import {
@@ -28,14 +14,6 @@ import type { CachedToken } from "./tokenCache.js";
  */
 export const SUPPORTED_BESZEL = ">=0.18 <0.19";
 
-/**
- * Check whether an observed agent/hub version string is within SUPPORTED_BESZEL.
- * Uses a simple semver parse — only supports major.minor.patch (no pre-release).
- *
- * Out-of-range: warns on stderr, does NOT throw.
- *
- * @param observedVersion - The `v` field from systems.info (e.g. "0.18.7").
- */
 export function checkVersion(observedVersion: string | undefined): void {
   if (!observedVersion) return;
 
@@ -83,14 +61,6 @@ export class BeszelClient {
     this.noCache = noCache;
   }
 
-  /**
-   * Ensure we have a valid token. If the cache holds a non-expired token
-   * scoped to the current url/collection/email, it is reused. Otherwise,
-   * a fresh auth call is made and the result is cached.
-   *
-   * @throws {CliError} AUTH_FAILED if credentials are rejected.
-   * @throws {CliError} NETWORK_ERROR if the auth endpoint is unreachable.
-   */
   async authenticate(): Promise<string> {
     const cached = readCache({
       noCache: this.noCache,
@@ -180,13 +150,6 @@ export class BeszelClient {
     return data.token;
   }
 
-  /**
-   * Make an authenticated GET request. On 401, clears the cache, re-auths
-   * once, and retries. A second 401 throws AUTH_FAILED exit 2.
-   *
-   * @param path - Path relative to the hub URL (must start with /).
-   * @param isRetry - Internal flag — prevents infinite retry loops.
-   */
   async request<T = unknown>(path: string, isRetry = false): Promise<T> {
     if (!this.token) {
       await this.authenticate();
@@ -250,13 +213,6 @@ export class BeszelClient {
     }
   }
 
-  /**
-   * Fetch a page of records from a PocketBase collection, applying optional
-   * filter, sort, fields, pagination, and skipTotal parameters.
-   *
-   * @param collection - PocketBase collection name.
-   * @param opts - Query options.
-   */
   async listRecords<T = unknown>(collection: string, opts: ListOptions = {}): Promise<T> {
     const params = new URLSearchParams();
 
@@ -274,10 +230,6 @@ export class BeszelClient {
   }
 }
 
-/**
- * Build a {@link BeszelClient} from config and ensure a valid token is
- * loaded before returning. Callers can immediately call `listRecords()`.
- */
 export async function createClient(config: BeszelConfig, noCache = false): Promise<BeszelClient> {
   const client = new BeszelClient(config, noCache);
   await client.authenticate();

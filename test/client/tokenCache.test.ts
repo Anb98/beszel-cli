@@ -1,16 +1,3 @@
-/**
- * tokenCache.test.ts — Unit tests for src/client/tokenCache.ts
- *
- * Tests are purely in-process (no HTTP, no msw). They write to a temp
- * directory to avoid touching the real ~/.cache/beszel-cli/token.json.
- *
- * Covers:
- * - decodeJwtExp: valid JWT / malformed / missing exp
- * - isTokenValid: future / past / within-skew
- * - readCache / writeCache / clearCache: round-trip, no-cache bypass,
- *   scope mismatch, expired token, corrupt JSON
- */
-
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
