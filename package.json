@@ -1,6 +1,6 @@
 {
   "name": "beszel-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Read-only Beszel monitoring CLI for humans and AI agents — clean JSON output or colored TTY tables",
   "keywords": [
     "beszel",

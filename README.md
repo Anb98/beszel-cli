@@ -6,8 +6,7 @@
 [![license](https://img.shields.io/npm/l/beszel-cli.svg)](./LICENSE)
 [![node](https://img.shields.io/node/v/beszel-cli.svg)](https://nodejs.org)
 
-> [!NOTE]
-> **Unofficial.** This is a community CLI and is **not** affiliated with or endorsed by the Beszel project. It talks to a Beszel hub through its public API.
+> ℹ️ **Unofficial.** This is a community CLI and is **not** affiliated with or endorsed by the Beszel project. It talks to a Beszel hub through its public API.
 
 All commands are **read-only** — the CLI never mutates your hub. Output is machine-friendly JSON by default in pipelines, or human-friendly TTY tables with color in a terminal.
 
