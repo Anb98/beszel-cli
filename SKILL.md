@@ -1,10 +1,33 @@
+---
+name: beszel
+description: "Trigger: Beszel monitoring, fleet metrics, system/container/disk/temp stats, hub health. Query a Beszel hub read-only via the `beszel` CLI; returns JSON or human tables."
+license: MIT
+---
+
 # beszel — Agent Skill Reference
 
 > Machine-generated from the command-contract registry. Do NOT hand-edit.
 > Beszel version range: `>=0.18 <0.19` (out-of-range → stderr warning, never an error).
 
-This skill enables an AI agent to query a Beszel monitoring hub via the `beszel` CLI.
-All commands are **read-only**. JSON mode is always safe to use with `--json`.
+## When to use
+
+Use this skill to **read** monitoring data from a Beszel hub: fleet inventory, live
+system metrics, container/disk/temperature stats, historical series, and fleet health
+checks. Every command is **read-only** and never mutates the hub. Prefer `--json` for
+any programmatic decision — it is always safe and the output shapes below are stable.
+
+## Contents
+
+- [Quick Start](#quick-start)
+- [Command Reference](#command-reference)
+- [Command Detail](#command-detail)
+- [Exit Codes](#exit-codes)
+- [Error Envelope](#error-envelope)
+- [Environment Variables](#environment-variables)
+- [Field Stability Contract](#field-stability-contract)
+- [`--since` Duration Format](#--since-duration-format)
+- [System Resolution](#system-resolution-beszel-system)
+- [Worked Agent Examples](#worked-agent-examples)
 
 ---
 

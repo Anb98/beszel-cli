@@ -1,0 +1,24 @@
+# The published package ships only the compiled output (dist/) and SKILL.md,
+# both declared in package.json "files". This file exists to OVERRIDE the
+# fallback to .gitignore (which ignores dist/) during `npm pack`/`npm publish`.
+
+# Source & tooling — not needed at runtime
+src/
+test/
+scripts/
+coverage/
+
+# Configs
+tsconfig.json
+tsup.config.ts
+vitest.config.ts
+eslint.config.js
+.editorconfig
+.gitattributes
+
+# CI & package manager internals
+.github/
+.atl/
+.yarn/
+.yarnrc.yml
+yarn.lock

@@ -38,5 +38,5 @@ jobs:
       - name: Test
         run: yarn test
 
-      - name: Check skill.md is up-to-date
+      - name: Check SKILL.md is up-to-date
         run: yarn check:skill

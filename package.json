@@ -1,10 +1,39 @@
 {
   "name": "beszel-cli",
   "version": "0.1.0",
-  "description": "Read-only Beszel monitoring CLI for humans and agents",
+  "description": "Read-only Beszel monitoring CLI for humans and AI agents — clean JSON output or colored TTY tables",
+  "keywords": [
+    "beszel",
+    "monitoring",
+    "observability",
+    "cli",
+    "homelab",
+    "devops",
+    "metrics",
+    "systems",
+    "agent",
+    "json"
+  ],
+  "license": "MIT",
+  "author": "Anb98 <aabdiel1998@gmail.com>",
+  "homepage": "https://github.com/Anb98/beszel-cli#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Anb98/beszel-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Anb98/beszel-cli/issues"
+  },
   "type": "module",
   "bin": {
     "beszel": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "SKILL.md"
+  ],
+  "publishConfig": {
+    "access": "public"
   },
   "packageManager": "yarn@4.17.0",
   "engines": {
@@ -18,7 +47,8 @@
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
     "gen:skill": "tsx scripts/gen-skill.ts",
-    "check:skill": "tsx scripts/check-skill.ts"
+    "check:skill": "tsx scripts/check-skill.ts",
+    "prepack": "yarn build"
   },
   "dependencies": {
     "commander": "^15.0.0",
