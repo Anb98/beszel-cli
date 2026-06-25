@@ -18,10 +18,6 @@ import systemsFixture from "../fixtures/systems.json" with { type: "json" };
 import systemStatsFixture from "../fixtures/system_stats.json" with { type: "json" };
 import smartFixture from "../fixtures/smart_devices.json" with { type: "json" };
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
 const BASE_URL = "http://beszel-temps.test";
 const VALID_CONFIG: BeszelConfig = {
   url: BASE_URL,
@@ -44,10 +40,6 @@ const statsWithAllSystems = {
   page: 1, perPage: 500, totalItems: 1, totalPages: 1,
   items: systemStatsFixture.items,
 };
-
-// ---------------------------------------------------------------------------
-// MSW server
-// ---------------------------------------------------------------------------
 
 const defaultHandlers = [
   http.post(`${BASE_URL}${AUTH_PATH}`, () =>
@@ -75,10 +67,6 @@ async function makeClient(): Promise<BeszelClient> {
   await client.authenticate();
   return client;
 }
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 describe("fetchTemps", () => {
   describe("basic — without --disks", () => {

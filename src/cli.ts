@@ -17,16 +17,8 @@ import { registerDisks } from "./commands/disks.js";
 import { registerTemps } from "./commands/temps.js";
 import { registerHealth } from "./commands/health.js";
 
-// ---------------------------------------------------------------------------
-// Package version — loaded at runtime to avoid duplicating the version string.
-// ---------------------------------------------------------------------------
-
 const require = createRequire(import.meta.url);
 const pkg = require("../package.json") as { version: string };
-
-// ---------------------------------------------------------------------------
-// Root program
-// ---------------------------------------------------------------------------
 
 const program = new Command();
 
@@ -39,19 +31,11 @@ program
   .option("--no-color", "Suppress ANSI colors in TTY output")
   .option("--no-cache", "Disable token cache; always re-authenticate");
 
-// ---------------------------------------------------------------------------
-// Subcommands (Phase 6)
-// ---------------------------------------------------------------------------
-
 registerSystems(program);
 registerSystem(program);
 registerContainers(program);
 registerDisks(program);
 registerTemps(program);
 registerHealth(program);
-
-// ---------------------------------------------------------------------------
-// Parse
-// ---------------------------------------------------------------------------
 
 program.parse(process.argv);

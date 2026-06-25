@@ -40,10 +40,6 @@ import smartDevicesFixture from "../fixtures/smart_devices.json" with { type: "j
 import smartDevicesDegradedFixture from "../fixtures/smart_devices_degraded.json" with { type: "json" };
 import systemStatsFixture from "../fixtures/system_stats.json" with { type: "json" };
 
-// ---------------------------------------------------------------------------
-// Constants / helpers
-// ---------------------------------------------------------------------------
-
 const BASE_URL = "http://beszel-health-cmd.test";
 const VALID_CONFIG: BeszelConfig = {
   url: BASE_URL,
@@ -103,10 +99,6 @@ function healthyRaid(overrides: Partial<HealthDevice> = {}): HealthDevice {
   };
 }
 
-// ---------------------------------------------------------------------------
-// MSW server (for full-pipeline integration tests)
-// ---------------------------------------------------------------------------
-
 const server = setupServer(
   http.post(`${BASE_URL}${AUTH_PATH}`, () =>
     HttpResponse.json({ token: TOKEN }),
@@ -132,10 +124,6 @@ async function makeClient(): Promise<BeszelClient> {
   return client;
 }
 
-// ---------------------------------------------------------------------------
-// S1: Healthy fleet
-// ---------------------------------------------------------------------------
-
 describe("REQ-8 S1 — healthy fleet", () => {
   it("returns healthy:true when all conditions are within thresholds", () => {
     const systems = [healthySystem()];
@@ -154,10 +142,6 @@ describe("REQ-8 S1 — healthy fleet", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// S2: System down
-// ---------------------------------------------------------------------------
-
 describe("REQ-8 S2 — system down", () => {
   it("reports severity:crit kind:down when system status != 'up'", () => {
     const systems = [healthySystem({ status: "down" })];
@@ -175,10 +159,6 @@ describe("REQ-8 S2 — system down", () => {
     expect(healthExitCode(report)).toBe(1);
   });
 });
-
-// ---------------------------------------------------------------------------
-// S3: SMART failure
-// ---------------------------------------------------------------------------
 
 describe("REQ-8 S3 — SMART disk failure", () => {
   it("reports severity:crit kind:smart when disk state != PASSED", () => {
@@ -202,10 +182,6 @@ describe("REQ-8 S3 — SMART disk failure", () => {
     expect(issue!.severity).toBe("crit");
   });
 });
-
-// ---------------------------------------------------------------------------
-// S4: RAID degraded
-// ---------------------------------------------------------------------------
 
 describe("REQ-8 S4 — RAID degraded (CRITICAL)", () => {
   it("reports severity:crit kind:raid when arrayState=degraded", () => {
@@ -237,10 +213,6 @@ describe("REQ-8 S4 — RAID degraded (CRITICAL)", () => {
     expect(issue!.severity).toBe("crit");
   });
 });
-
-// ---------------------------------------------------------------------------
-// S5: RAID syncing (WARNING only — exit 0)
-// ---------------------------------------------------------------------------
 
 describe("REQ-8 S5 — RAID syncing (WARNING, exit 0)", () => {
   it("reports severity:warn kind:raid when syncAction=resync and arrayState=clean", () => {
@@ -274,10 +246,6 @@ describe("REQ-8 S5 — RAID syncing (WARNING, exit 0)", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// S6: Disk usage WARNING — exits 0
-// ---------------------------------------------------------------------------
-
 describe("REQ-8 S6 — disk usage warning (exits 0)", () => {
   it("reports severity:warn kind:disk when diskPct > 90 (default warn)", () => {
     const systems = [healthySystem({ diskPct: 92 })];
@@ -304,10 +272,6 @@ describe("REQ-8 S6 — disk usage warning (exits 0)", () => {
     expect(healthExitCode(report)).toBe(1);
   });
 });
-
-// ---------------------------------------------------------------------------
-// S7: Temperature CRITICAL
-// ---------------------------------------------------------------------------
 
 describe("REQ-8 S7 — temperature critical", () => {
   it("reports severity:crit kind:temp when displayTempC > 90°C", () => {
@@ -337,10 +301,6 @@ describe("REQ-8 S7 — temperature critical", () => {
     expect(issue!.severity).toBe("crit");
   });
 });
-
-// ---------------------------------------------------------------------------
-// S8: --strict promotes warning to critical
-// ---------------------------------------------------------------------------
 
 describe("REQ-8 S8 — --strict promotes warning to critical", () => {
   it("promotes disk warn to crit under --strict", () => {
@@ -374,10 +334,6 @@ describe("REQ-8 S8 — --strict promotes warning to critical", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// S9: Custom threshold via flag
-// ---------------------------------------------------------------------------
-
 describe("REQ-8 S9 — custom threshold via flag", () => {
   it("reports warning when diskPct > custom diskWarn=85", () => {
     const customThresholds = resolveThresholds({ diskWarn: 85, diskCrit: 95 }, {});
@@ -407,10 +363,6 @@ describe("REQ-8 S9 — custom threshold via flag", () => {
     expect(issue!.severity).toBe("crit");
   });
 });
-
-// ---------------------------------------------------------------------------
-// Full-pipeline integration tests (MSW-backed HTTP)
-// ---------------------------------------------------------------------------
 
 describe("beszel health — full pipeline (MSW)", () => {
   it("returns healthy:true for the clean fixture fleet", async () => {

@@ -22,10 +22,6 @@ import type { BeszelConfig } from "../../src/client/config.js";
 
 import systemStatsFixture from "../fixtures/system_stats.json" with { type: "json" };
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
 const BASE_URL = "http://beszel-stats.test";
 const VALID_CONFIG: BeszelConfig = {
   url: BASE_URL,
@@ -48,10 +44,6 @@ const FIXED_NOW = new Date("2026-06-24T17:00:00.000Z");
 // In PocketBase space format:       "2026-06-24 05:00:00.000Z"
 const EXPECTED_FROM_PB = "2026-06-24 05:00:00.000Z";
 const EXPECTED_FROM_ISO = "2026-06-24T05:00:00.000Z";
-
-// ---------------------------------------------------------------------------
-// MSW server
-// ---------------------------------------------------------------------------
 
 let capturedFilter: string | null = null;
 
@@ -78,10 +70,6 @@ async function makeClient(): Promise<BeszelClient> {
   await client.authenticate();
   return client;
 }
-
-// ---------------------------------------------------------------------------
-// Tests — BUG 2 regression: PocketBase filter datetime format
-// ---------------------------------------------------------------------------
 
 describe("fetchStats — PocketBase datetime filter format (BUG 2 regression)", () => {
   it("sends filter with space-format datetime (not ISO T format)", async () => {

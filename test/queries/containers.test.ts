@@ -18,10 +18,6 @@ import type { BeszelConfig } from "../../src/client/config.js";
 import containersFixture from "../fixtures/containers.json" with { type: "json" };
 import systemsFixture from "../fixtures/systems.json" with { type: "json" };
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
 const BASE_URL = "http://beszel-containers.test";
 const VALID_CONFIG: BeszelConfig = {
   url: BASE_URL,
@@ -38,18 +34,10 @@ function buildJwt(exp: number): string {
 }
 const VALID_TOKEN = buildJwt(Math.floor(Date.now() / 1000) + 7 * 86400);
 
-// ---------------------------------------------------------------------------
-// Capture request details for assertion (sort, filter, perPage)
-// ---------------------------------------------------------------------------
-
 interface CapturedRequest {
   url: URL;
   params: URLSearchParams;
 }
-
-// ---------------------------------------------------------------------------
-// MSW server
-// ---------------------------------------------------------------------------
 
 const defaultHandlers = [
   http.post(`${BASE_URL}${AUTH_PATH}`, () =>
@@ -77,10 +65,6 @@ async function makeClient(): Promise<BeszelClient> {
   await client.authenticate();
   return client;
 }
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 describe("fetchContainers", () => {
   describe("basic listing", () => {

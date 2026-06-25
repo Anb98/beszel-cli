@@ -27,17 +27,9 @@ import {
   mapTempInfo,
 } from "../../src/mapping/key-map.js";
 
-// ---------------------------------------------------------------------------
-// Helper
-// ---------------------------------------------------------------------------
-
 function parseOrThrow<T>(schema: { parse: (v: unknown) => T }, data: unknown): T {
   return schema.parse(data);
 }
-
-// ---------------------------------------------------------------------------
-// 1. SystemRecord — extra keys + missing optional info fields
-// ---------------------------------------------------------------------------
 
 describe("SystemRecord schema resilience", () => {
   it("passes with extra unknown keys at top level", () => {
@@ -142,10 +134,6 @@ describe("SystemRecord schema resilience", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// 2. SystemStatsRecord — extra keys + missing stats fields
-// ---------------------------------------------------------------------------
-
 describe("SystemStatsRecord schema resilience", () => {
   it("passes with extra unknown fields in stats", () => {
     const input = {
@@ -208,10 +196,6 @@ describe("SystemStatsRecord schema resilience", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// 3. ContainerRecord — extra keys + missing optional fields
-// ---------------------------------------------------------------------------
-
 describe("ContainerRecord schema resilience", () => {
   it("passes with extra unknown fields", () => {
     const input = {
@@ -265,10 +249,6 @@ describe("ContainerRecord schema resilience", () => {
     expect(mapped.health).toBe(1);
   });
 });
-
-// ---------------------------------------------------------------------------
-// 4. SmartDeviceRecord — extra keys + RAID missing attributes
-// ---------------------------------------------------------------------------
 
 describe("SmartDeviceRecord schema resilience", () => {
   it("passes with extra unknown fields on a disk record", () => {
@@ -370,10 +350,6 @@ describe("SmartDeviceRecord schema resilience", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// 5. SystemDetailsRecord — extra keys + missing optional fields
-// ---------------------------------------------------------------------------
-
 describe("SystemDetailsRecord schema resilience", () => {
   it("passes with extra unknown fields", () => {
     const input = {
@@ -415,10 +391,6 @@ describe("SystemDetailsRecord schema resilience", () => {
     expect("podman" in mapped).toBe(false);
   });
 });
-
-// ---------------------------------------------------------------------------
-// 6. mapTempInfo — resilience with missing stats/disk records
-// ---------------------------------------------------------------------------
 
 describe("mapTempInfo schema resilience", () => {
   it("returns empty sensors and null displayTempC when info and stats are absent", () => {

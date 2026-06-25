@@ -29,10 +29,6 @@ import type {
   TempInfo,
 } from "../types/output.js";
 
-// ---------------------------------------------------------------------------
-// Internal helper — extract RAID attributes from the attributes array
-// ---------------------------------------------------------------------------
-
 type RaidAttributes = {
   arrayState: string | null;
   raidLevel: string | null;
@@ -88,10 +84,6 @@ function extractRaidAttributes(
   return result;
 }
 
-// ---------------------------------------------------------------------------
-// T-1.4: mapSystem — systems record → SystemItem
-// ---------------------------------------------------------------------------
-
 /**
  * Maps an upstream systems record (abbreviated keys) to a canonical SystemItem.
  *
@@ -125,7 +117,6 @@ export function mapSystem(record: SystemRecord): SystemItem {
     agentVersion: info.v ?? null, // info.v   → agentVersion (undocumented; live recon #472)
   };
 
-  // optional fields: include only when upstream has the key
   if (info.dt !== undefined) {
     item.tempC = info.dt; // info.dt → displayTempC (undocumented; live recon #472)
   }
@@ -142,18 +133,9 @@ export function mapSystem(record: SystemRecord): SystemItem {
   return item;
 }
 
-// ---------------------------------------------------------------------------
-// mapSystemDetail — systems record → SystemDetail (same fields as SystemItem)
-// ---------------------------------------------------------------------------
-
 export function mapSystemDetail(record: SystemRecord): SystemDetail {
-  // SystemDetail has the same fields as SystemItem; delegate
   return mapSystem(record);
 }
-
-// ---------------------------------------------------------------------------
-// mapSystemDetailsInfo — system_details record → SystemDetailsInfo
-// ---------------------------------------------------------------------------
 
 export function mapSystemDetailsInfo(
   record: SystemDetailsRecord
@@ -175,10 +157,6 @@ export function mapSystemDetailsInfo(
 
   return info;
 }
-
-// ---------------------------------------------------------------------------
-// mapContainer — containers record → ContainerInfo
-// ---------------------------------------------------------------------------
 
 /**
  * Maps a containers record to ContainerInfo.
@@ -206,10 +184,6 @@ export function mapContainer(
 
   return info;
 }
-
-// ---------------------------------------------------------------------------
-// mapSystemStats — system_stats.stats → sensor map + metric snapshot
-// ---------------------------------------------------------------------------
 
 /**
  * Maps system_stats.stats abbreviated fields to canonical names.
@@ -266,10 +240,6 @@ export function mapSystemStats(record: SystemStatsRecord): MappedSystemStats {
   };
 }
 
-// ---------------------------------------------------------------------------
-// mapContainerStatsItem — container_stats array item → ContainerStatsOutput
-// ---------------------------------------------------------------------------
-
 /**
  * Maps one item from container_stats.stats[] to a named output shape.
  *
@@ -296,10 +266,6 @@ export function mapContainerStatsItem(
     net: item.b ?? null,    // b → net [rx, tx] (undocumented; live recon #472)
   };
 }
-
-// ---------------------------------------------------------------------------
-// mapSmartDevice — smart_devices record → DeviceInfo (disk or raid)
-// ---------------------------------------------------------------------------
 
 /**
  * Maps a smart_devices record to either a DiskInfo or RaidInfo depending on
@@ -332,7 +298,6 @@ export function mapSmartDevice(
     } satisfies RaidInfo;
   }
 
-  // Physical disk (sat | nvme | scsi | unknown)
   const disk: DiskInfo = {
     kind: "disk",
     name: record.name,
@@ -344,7 +309,6 @@ export function mapSmartDevice(
     type: record.type ?? null,
   };
 
-  // Optional fields: include only when present
   if (record.serial !== undefined) disk.serial = record.serial;
   if (record.firmware !== undefined) disk.firmware = record.firmware;
   if (record.hours !== undefined) disk.hours = record.hours;
@@ -352,10 +316,6 @@ export function mapSmartDevice(
 
   return disk;
 }
-
-// ---------------------------------------------------------------------------
-// mapTempInfo — produce TempInfo for one system
-// ---------------------------------------------------------------------------
 
 /**
  * Produces a TempInfo for a system using:
@@ -369,17 +329,12 @@ export function mapTempInfo(
   statsRecord: SystemStatsRecord | null,
   diskRecords?: SmartDeviceRecord[]
 ): TempInfo {
-  // info.dt → displayTempC (undocumented; live recon #472)
   const displayTempC = systemRecord.info?.dt ?? null;
-
-  // stats.t → sensors map (undocumented; live recon #472)
   const sensors: Record<string, number> = statsRecord?.stats?.t ?? {};
 
-  // optional: merge disk temps under "{deviceBaseName}_temp"
   if (diskRecords) {
     for (const disk of diskRecords) {
       if (disk.temp !== undefined && disk.type !== "mdraid") {
-        // derive a readable key from the device path, e.g. /dev/sda → sda
         const base = disk.name.replace(/^\/dev\//, "").replace(/[^a-zA-Z0-9]/g, "_");
         sensors[`${base}_temp`] = disk.temp; // smart_devices.temp (live recon #472)
       }

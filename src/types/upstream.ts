@@ -10,10 +10,6 @@
 
 import { z } from "zod";
 
-// ---------------------------------------------------------------------------
-// Shared primitives
-// ---------------------------------------------------------------------------
-
 /**
  * PocketBase standard autodate string (ISO 8601).
  * Present on systems, system_stats, smart_devices, system_details.
@@ -65,11 +61,6 @@ export const SystemRecordSchema = z.looseObject({
 
 export type SystemRecord = z.infer<typeof SystemRecordSchema>;
 
-// ---------------------------------------------------------------------------
-// system_stats — per-interval time-series (type ∈ 1m|10m|20m|120m|480m)
-// provenance: undocumented; discovered via live recon (#472)
-// ---------------------------------------------------------------------------
-
 /**
  * Per-sensor temperature map: {sensorName: celsius}
  * e.g. {cpu_thermal: 52, ddr_thermal: 40, gpu_thermal: 38, ve_thermal: 41}
@@ -113,11 +104,6 @@ export const SystemStatsRecordSchema = z.looseObject({
 
 export type SystemStatsRecord = z.infer<typeof SystemStatsRecordSchema>;
 
-// ---------------------------------------------------------------------------
-// container_stats — per-system-per-interval array of container metrics
-// provenance: undocumented; discovered via live recon (#472)
-// ---------------------------------------------------------------------------
-
 /**
  * One container's stats snapshot within the array.
  * n=name, c=cpu%, m=memMB, b=[rxBytes,txBytes]
@@ -144,11 +130,6 @@ export const ContainerStatsRecordSchema = z.looseObject({
 
 export type ContainerStatsRecord = z.infer<typeof ContainerStatsRecordSchema>;
 
-// ---------------------------------------------------------------------------
-// containers — live container list (server-sortable by cpu, memory)
-// provenance: verified via live recon (#472); totalItems=50 on test instance
-// ---------------------------------------------------------------------------
-
 export const ContainerRecordSchema = z.looseObject({
   id: z.string(),
   name: z.string(),
@@ -174,11 +155,6 @@ export const ContainerRecordSchema = z.looseObject({
 });
 
 export type ContainerRecord = z.infer<typeof ContainerRecordSchema>;
-
-// ---------------------------------------------------------------------------
-// smart_devices — physical disks AND md-RAID arrays
-// provenance: verified via live recon (#472); totalItems=12 on test instance
-// ---------------------------------------------------------------------------
 
 /**
  * RAID mdraid attribute entry.
@@ -214,11 +190,6 @@ export const SmartDeviceRecordSchema = z.looseObject({
 
 export type SmartDeviceRecord = z.infer<typeof SmartDeviceRecordSchema>;
 
-// ---------------------------------------------------------------------------
-// system_details — one record per system (id == system id)
-// provenance: verified via live recon (#472)
-// ---------------------------------------------------------------------------
-
 export const SystemDetailsRecordSchema = z.looseObject({
   id: z.string(),
   hostname: z.string().optional(),
@@ -235,11 +206,6 @@ export const SystemDetailsRecordSchema = z.looseObject({
 
 export type SystemDetailsRecord = z.infer<typeof SystemDetailsRecordSchema>;
 
-// ---------------------------------------------------------------------------
-// systemd_services — EMPTY on Alpine/OpenRC hosts; CLI must handle gracefully
-// provenance: verified via live recon (#472); totalItems=0 on test instance
-// ---------------------------------------------------------------------------
-
 export const SystemdServiceRecordSchema = z.looseObject({
   id: z.string(),
   name: z.string().optional(),
@@ -248,10 +214,6 @@ export const SystemdServiceRecordSchema = z.looseObject({
 });
 
 export type SystemdServiceRecord = z.infer<typeof SystemdServiceRecordSchema>;
-
-// ---------------------------------------------------------------------------
-// PocketBase list response envelope (generic)
-// ---------------------------------------------------------------------------
 
 export const PocketBaseListSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
   z.looseObject({

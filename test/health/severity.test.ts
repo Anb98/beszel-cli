@@ -21,15 +21,7 @@ import { evaluateHealth, healthExitCode } from "../../src/health/severity.js";
 import { resolveThresholds } from "../../src/health/thresholds.js";
 import type { HealthDevice, HealthSystem } from "../../src/health/severity.js";
 
-// ---------------------------------------------------------------------------
-// Default thresholds (no flags, no env)
-// ---------------------------------------------------------------------------
-
 const DEFAULT_THRESHOLDS = resolveThresholds({}, {});
-
-// ---------------------------------------------------------------------------
-// Fixture helpers
-// ---------------------------------------------------------------------------
 
 function healthySystem(overrides: Partial<HealthSystem> = {}): HealthSystem {
   return {
@@ -63,10 +55,6 @@ function passedDisk(overrides: Partial<HealthDevice> = {}): HealthDevice {
   };
 }
 
-// ---------------------------------------------------------------------------
-// S1 — Healthy fleet
-// ---------------------------------------------------------------------------
-
 describe("S1 — healthy fleet", () => {
   it("returns healthy:true with no issues and exit 0", () => {
     const systems = [healthySystem()];
@@ -91,10 +79,6 @@ describe("S1 — healthy fleet", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// S2 — System down
-// ---------------------------------------------------------------------------
-
 describe("S2 — system down", () => {
   it("system status='down' → CRITICAL kind:'down', exit 1", () => {
     const systems = [healthySystem({ status: "down" })];
@@ -114,10 +98,6 @@ describe("S2 — system down", () => {
     expect(issue?.severity).toBe("crit");
   });
 });
-
-// ---------------------------------------------------------------------------
-// S3 — SMART disk FAILED
-// ---------------------------------------------------------------------------
 
 describe("S3 — SMART disk FAILED", () => {
   it("disk state='FAILED' → CRITICAL kind:'smart', exit 1", () => {
@@ -147,10 +127,6 @@ describe("S3 — SMART disk FAILED", () => {
     expect(smartIssues).toHaveLength(0);
   });
 });
-
-// ---------------------------------------------------------------------------
-// S4 — RAID degraded → CRITICAL
-// ---------------------------------------------------------------------------
 
 describe("S4 — RAID degraded", () => {
   it("arrayState='degraded' → CRITICAL kind:'raid', exit 1", () => {
@@ -188,10 +164,6 @@ describe("S4 — RAID degraded", () => {
     expect(issue?.severity).toBe("crit");
   });
 });
-
-// ---------------------------------------------------------------------------
-// S5 — RAID syncing (clean + resync) → WARNING only, exit 0
-// ---------------------------------------------------------------------------
 
 describe("S5 — RAID syncing", () => {
   it("arrayState='clean', syncAction='resync' → WARNING kind:'raid', exit 0", () => {
@@ -251,10 +223,6 @@ describe("S5 — RAID syncing", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// S6 — Disk usage warning only, exit 0
-// ---------------------------------------------------------------------------
-
 describe("S6 — disk usage warning", () => {
   it("diskPct=92 (> 90 warn, < 95 crit) → WARNING kind:'disk', healthy:false, exit 0", () => {
     const systems = [healthySystem({ diskPct: 92 })];
@@ -288,10 +256,6 @@ describe("S6 — disk usage warning", () => {
     expect(diskIssues).toHaveLength(0);
   });
 });
-
-// ---------------------------------------------------------------------------
-// S7 — Temperature CRITICAL
-// ---------------------------------------------------------------------------
 
 describe("S7 — temperature CRITICAL", () => {
   it("displayTempC=91 (> 90 crit) → CRITICAL kind:'temp', exit 1", () => {
@@ -341,10 +305,6 @@ describe("S7 — temperature CRITICAL", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// S8 — --strict promotes warning to critical
-// ---------------------------------------------------------------------------
-
 describe("S8 — --strict promotes all warnings to critical", () => {
   it("disk usage 92% (warning) → CRITICAL with --strict, exit 1", () => {
     const strictThresholds = resolveThresholds({ strict: true }, {});
@@ -376,10 +336,6 @@ describe("S8 — --strict promotes all warnings to critical", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// S9 — Custom threshold override
-// ---------------------------------------------------------------------------
-
 describe("S9 — custom threshold via flag", () => {
   it("--disk-warn 85: diskPct=87 triggers WARNING", () => {
     const customThresholds = resolveThresholds({ diskWarn: 85 }, {});
@@ -409,10 +365,6 @@ describe("S9 — custom threshold via flag", () => {
     expect(healthExitCode(report)).toBe(0);
   });
 });
-
-// ---------------------------------------------------------------------------
-// healthExitCode
-// ---------------------------------------------------------------------------
 
 describe("healthExitCode", () => {
   it("returns 1 when any CRITICAL issue exists", () => {

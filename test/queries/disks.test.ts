@@ -20,10 +20,6 @@ import smartFixture from "../fixtures/smart_devices.json" with { type: "json" };
 import smartDegradedFixture from "../fixtures/smart_devices_degraded.json" with { type: "json" };
 import systemsFixture from "../fixtures/systems.json" with { type: "json" };
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
 const BASE_URL = "http://beszel-disks.test";
 const VALID_CONFIG: BeszelConfig = {
   url: BASE_URL,
@@ -39,10 +35,6 @@ function buildJwt(exp: number): string {
   return `${h}.${p}.sig`;
 }
 const VALID_TOKEN = buildJwt(Math.floor(Date.now() / 1000) + 7 * 86400);
-
-// ---------------------------------------------------------------------------
-// MSW server
-// ---------------------------------------------------------------------------
 
 const defaultHandlers = [
   http.post(`${BASE_URL}${AUTH_PATH}`, () =>
@@ -70,10 +62,6 @@ async function makeClient(): Promise<BeszelClient> {
   await client.authenticate();
   return client;
 }
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 describe("fetchDisks", () => {
   describe("basic listing", () => {

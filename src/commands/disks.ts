@@ -17,10 +17,6 @@ import { emit, resolveMode, type RenderCallback } from "../utils/output.js";
 import { handleError } from "../utils/errors.js";
 import type { DisksOutput } from "../types/output.js";
 
-// ---------------------------------------------------------------------------
-// registerDisks — attach the `disks` subcommand to a Commander program
-// ---------------------------------------------------------------------------
-
 export function registerDisks(program: Command): void {
   program
     .command("disks")
@@ -44,7 +40,6 @@ export function registerDisks(program: Command): void {
           failing: opts.failing,
         });
 
-        // TTY renderer — loaded dynamically so Ink is never on the agent path.
         const renderer: RenderCallback<DisksOutput> = async (data) => {
           const { renderDisksList } = await import("../renderers/ink/DisksList.js");
           await renderDisksList(data);

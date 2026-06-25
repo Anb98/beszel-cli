@@ -6,10 +6,6 @@
  * associated process exit codes (cross-cutting; see design exit-code table).
  */
 
-// ---------------------------------------------------------------------------
-// ErrorCode union — all machine-readable error codes the CLI can emit
-// ---------------------------------------------------------------------------
-
 export type ErrorCode =
   /** Required env var missing (BESZEL_URL, EMAIL, PASSWORD) */
   | "CONFIG_MISSING"
@@ -28,10 +24,6 @@ export type ErrorCode =
   /** Catch-all for unexpected errors */
   | "INTERNAL_ERROR";
 
-// ---------------------------------------------------------------------------
-// Exit-code mapping — authoritative table; see design R5 and spec cross-cutting
-// ---------------------------------------------------------------------------
-
 /** Maps each ErrorCode to its process exit code. */
 export const EXIT_CODES: Record<ErrorCode, number> = {
   CONFIG_MISSING: 1,
@@ -43,10 +35,6 @@ export const EXIT_CODES: Record<ErrorCode, number> = {
   INVALID_THRESHOLD: 1,
   INTERNAL_ERROR: 1,
 };
-
-// ---------------------------------------------------------------------------
-// CliError — structured error that carries code, message, hint, and exitCode
-// ---------------------------------------------------------------------------
 
 export class CliError extends Error {
   readonly code: ErrorCode;
@@ -77,10 +65,6 @@ export class CliError extends Error {
     };
   }
 }
-
-// ---------------------------------------------------------------------------
-// Error envelope — the stdout shape for non-zero exits (spec cross-cutting)
-// ---------------------------------------------------------------------------
 
 export type ErrorEnvelope = {
   error: {

@@ -20,10 +20,6 @@ import systemsFixture from "../fixtures/systems.json" with { type: "json" };
 import systemStatsFixture from "../fixtures/system_stats.json" with { type: "json" };
 import smartDevicesFixture from "../fixtures/smart_devices.json" with { type: "json" };
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
 const BASE_URL = "http://beszel-temps-cmd.test";
 const VALID_CONFIG: BeszelConfig = {
   url: BASE_URL,
@@ -39,10 +35,6 @@ function buildJwt(exp: number): string {
   return `${h}.${p}.sig`;
 }
 const TOKEN = buildJwt(Math.floor(Date.now() / 1000) + 7 * 86400);
-
-// ---------------------------------------------------------------------------
-// MSW server
-// ---------------------------------------------------------------------------
 
 const server = setupServer(
   http.post(`${BASE_URL}${AUTH_PATH}`, () =>
@@ -68,10 +60,6 @@ async function makeClient(): Promise<BeszelClient> {
   await client.authenticate();
   return client;
 }
-
-// ---------------------------------------------------------------------------
-// Tests — REQ-7
-// ---------------------------------------------------------------------------
 
 describe("beszel temps — REQ-7", () => {
   describe("summary without --disks", () => {

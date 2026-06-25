@@ -17,10 +17,6 @@ import { emit, resolveMode, type RenderCallback } from "../utils/output.js";
 import { handleError } from "../utils/errors.js";
 import type { TempsOutput } from "../types/output.js";
 
-// ---------------------------------------------------------------------------
-// registerTemps — attach the `temps` subcommand to a Commander program
-// ---------------------------------------------------------------------------
-
 export function registerTemps(program: Command): void {
   program
     .command("temps")
@@ -40,7 +36,6 @@ export function registerTemps(program: Command): void {
         const client = await createClient(config, globalOpts.noCache ?? false);
         const result = await fetchTemps(client, { disks: opts.disks });
 
-        // TTY renderer — loaded dynamically so Ink is never on the agent path.
         const renderer: RenderCallback<TempsOutput> = async (data) => {
           const { renderTempsList } = await import("../renderers/ink/TempsList.js");
           await renderTempsList(data);

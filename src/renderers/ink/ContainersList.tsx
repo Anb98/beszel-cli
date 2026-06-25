@@ -9,10 +9,6 @@ import React from "react";
 import { Box, Text, render } from "ink";
 import type { ContainersOutput, ContainerInfo } from "../../types/output.js";
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 function useColor(): boolean {
   return !process.env["NO_COLOR"];
 }
@@ -66,10 +62,6 @@ function truncate(s: string | null, width: number): string {
   return s.length > width ? s.slice(0, width - 1) + "…" : s.padEnd(width);
 }
 
-// ---------------------------------------------------------------------------
-// Column widths
-// ---------------------------------------------------------------------------
-
 const COL = {
   name: 20,
   status: 10,
@@ -78,10 +70,6 @@ const COL = {
   mem: 10,
   image: 30,
 };
-
-// ---------------------------------------------------------------------------
-// Header
-// ---------------------------------------------------------------------------
 
 function Header(): React.ReactElement {
   return (
@@ -95,10 +83,6 @@ function Header(): React.ReactElement {
     </Box>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Container row
-// ---------------------------------------------------------------------------
 
 type ContainerRowProps = {
   item: ContainerInfo;
@@ -121,10 +105,6 @@ function ContainerRow({ item, colorEnabled }: ContainerRowProps): React.ReactEle
   );
 }
 
-// ---------------------------------------------------------------------------
-// Group by system
-// ---------------------------------------------------------------------------
-
 function groupBySystem(containers: ContainerInfo[]): Map<string, ContainerInfo[]> {
   const map = new Map<string, ContainerInfo[]>();
   for (const c of containers) {
@@ -135,10 +115,6 @@ function groupBySystem(containers: ContainerInfo[]): Map<string, ContainerInfo[]
   }
   return map;
 }
-
-// ---------------------------------------------------------------------------
-// ContainersList root component
-// ---------------------------------------------------------------------------
 
 type ContainersListProps = {
   data: ContainersOutput;
@@ -180,10 +156,6 @@ export function ContainersList({ data }: ContainersListProps): React.ReactElemen
     </Box>
   );
 }
-
-// ---------------------------------------------------------------------------
-// renderContainersList — dynamic-import entry point
-// ---------------------------------------------------------------------------
 
 export async function renderContainersList(data: ContainersOutput): Promise<void> {
   const { waitUntilExit } = render(<ContainersList data={data} />);

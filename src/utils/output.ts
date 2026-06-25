@@ -18,10 +18,6 @@
 
 import { serializeJson } from "../renderers/json.js";
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 /**
  * A render callback invoked in TTY mode. Loaded dynamically so the import
  * never reaches the agent path.
@@ -45,10 +41,6 @@ export type EmitOptions<T> = {
   renderer?: RenderCallback<T>;
 };
 
-// ---------------------------------------------------------------------------
-// resolveMode — determine JSON vs TTY
-// ---------------------------------------------------------------------------
-
 /**
  * Determine output mode.
  *
@@ -63,10 +55,6 @@ export function resolveMode(opts: { json?: boolean; noColor?: boolean }): "json"
   if (process.env["CI"]) return "json";
   return "tty";
 }
-
-// ---------------------------------------------------------------------------
-// emit — public API
-// ---------------------------------------------------------------------------
 
 /**
  * Emit `data` to stdout according to the resolved output mode.
@@ -84,7 +72,6 @@ export async function emit<T>(data: T, opts: EmitOptions<T> = {}): Promise<void>
     return;
   }
 
-  // TTY / human path.
   if (opts.noColor) {
     // Ink and Chalk both respect NO_COLOR (https://no-color.org/).
     process.env["NO_COLOR"] = "1";
@@ -96,7 +83,6 @@ export async function emit<T>(data: T, opts: EmitOptions<T> = {}): Promise<void>
     return;
   }
 
-  // No renderer supplied — fall back to pretty JSON. Safe: no Ink import.
   process.stdout.write(serializeJson(data));
   process.exitCode = exitCode;
 }

@@ -22,10 +22,6 @@ import {
 } from "../types/upstream.js";
 import { CliError } from "../types/errors.js";
 
-// ---------------------------------------------------------------------------
-// ContainersOptions — mirrors the CLI flags
-// ---------------------------------------------------------------------------
-
 export type ContainersOptions = {
   /** Limit results to top N items (server-side perPage). */
   top?: number;
@@ -34,10 +30,6 @@ export type ContainersOptions = {
   /** Filter to containers on a named system (name or id). */
   system?: string;
 };
-
-// ---------------------------------------------------------------------------
-// resolveSystemId — name → id lookup for --system filter
-// ---------------------------------------------------------------------------
 
 /**
  * Resolve a system name (case-insensitive) or id to a system id string.
@@ -90,10 +82,6 @@ async function resolveSystemId(
   );
 }
 
-// ---------------------------------------------------------------------------
-// fetchContainers — public API
-// ---------------------------------------------------------------------------
-
 /**
  * Fetch containers from the fleet, applying server-side sort and filter,
  * then mapping to ContainerInfo[].
@@ -108,16 +96,12 @@ export async function fetchContainers(
 ): Promise<ContainersOutput> {
   const ListSchema = PocketBaseListSchema(ContainerRecordSchema);
 
-  // Build server-side sort: -cpu or -memory for --sort flag; default -updated.
   // NEVER sort by -created (containers collection has NO created field → HTTP 400).
   let sort = "-updated";
   if (opts.sort === "cpu") sort = "-cpu";
   else if (opts.sort === "memory") sort = "-memory";
 
-  // Server-side perPage: use --top N if provided (limits network payload).
   const perPage = opts.top ?? 500;
-
-  // Build filter string for system lookup.
   let filterParts: string[] = [];
 
   if (opts.system !== undefined) {
@@ -136,8 +120,6 @@ export async function fetchContainers(
 
   const parsed = ListSchema.parse(raw);
 
-  // Build a system-id → system-name map for mapContainer().
-  // We fetch system names to pass the human-readable name to ContainerInfo.
   const systemIds = [...new Set(parsed.items.map((c) => c.system).filter(Boolean))] as string[];
 
   let systemNameMap: Map<string, string> = new Map();

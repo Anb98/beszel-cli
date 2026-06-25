@@ -9,10 +9,6 @@ import React from "react";
 import { Box, Text, render } from "ink";
 import type { TempsOutput, TempInfo } from "../../types/output.js";
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 function useColor(): boolean {
   return !process.env["NO_COLOR"];
 }
@@ -36,10 +32,6 @@ function fmtTemp(v: number | null): string {
   if (v == null) return "-";
   return `${v.toFixed(1)}°C`;
 }
-
-// ---------------------------------------------------------------------------
-// Per-system temp block
-// ---------------------------------------------------------------------------
 
 type TempBlockProps = {
   info: TempInfo;
@@ -93,10 +85,6 @@ function TempBlock({ info, colorEnabled }: TempBlockProps): React.ReactElement {
   );
 }
 
-// ---------------------------------------------------------------------------
-// TempsList root component
-// ---------------------------------------------------------------------------
-
 type TempsListProps = {
   data: TempsOutput;
 };
@@ -124,10 +112,6 @@ export function TempsList({ data }: TempsListProps): React.ReactElement {
     </Box>
   );
 }
-
-// ---------------------------------------------------------------------------
-// renderTempsList — dynamic-import entry point
-// ---------------------------------------------------------------------------
 
 export async function renderTempsList(data: TempsOutput): Promise<void> {
   const { waitUntilExit } = render(<TempsList data={data} />);

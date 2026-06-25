@@ -18,10 +18,6 @@
 
 import { CliError } from "../types/errors.js";
 
-// ---------------------------------------------------------------------------
-// Bucket definitions — ordered smallest to largest
-// ---------------------------------------------------------------------------
-
 export type IntervalBucket = "1m" | "10m" | "20m" | "120m" | "480m";
 
 type Bucket = {
@@ -39,10 +35,6 @@ const BUCKETS: readonly Bucket[] = [
 ];
 
 const MAX_WINDOW_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
-
-// ---------------------------------------------------------------------------
-// parseDuration — "30m" / "12h" / "2d" / "90s" → milliseconds
-// ---------------------------------------------------------------------------
 
 /**
  * Parse a duration string into milliseconds.
@@ -74,14 +66,9 @@ export function parseDuration(input: string): number {
     case "h": return value * 60 * 60 * 1000;
     case "d": return value * 24 * 60 * 60 * 1000;
     default:
-      // Unreachable given the regex, but satisfies TypeScript exhaustiveness.
       throw new CliError("INVALID_DURATION", `Unknown unit: "${unit}"`, "");
   }
 }
-
-// ---------------------------------------------------------------------------
-// selectInterval — pick smallest bucket covering the window
-// ---------------------------------------------------------------------------
 
 /**
  * Select the smallest interval bucket whose retention covers the requested
@@ -91,7 +78,6 @@ export function parseDuration(input: string): number {
  * @returns The interval bucket string.
  */
 export function selectInterval(windowMs: number): IntervalBucket {
-  // Clamp if window exceeds 30 days — warn on stderr, carry on.
   if (windowMs > MAX_WINDOW_MS) {
     process.stderr.write(
       `[beszel] WARNING: --since window exceeds 30 days. Clamping to 480m (30d) bucket.\n`,
@@ -105,17 +91,8 @@ export function selectInterval(windowMs: number): IntervalBucket {
     }
   }
 
-  // Fallback — should not be reached given the clamp above.
   return "480m";
 }
-
-// ---------------------------------------------------------------------------
-// SinceResult — the resolved envelope metadata
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// toPocketBaseDateTime — convert ISO 8601 to PocketBase filter datetime format
-// ---------------------------------------------------------------------------
 
 /**
  * Convert an ISO 8601 datetime string to the PocketBase datetime filter format.
@@ -135,9 +112,6 @@ export function selectInterval(windowMs: number): IntervalBucket {
  * @returns PocketBase filter datetime string with space separator.
  */
 export function toPocketBaseDateTime(iso: string): string {
-  // Replace the literal "T" separator with a space.
-  // Input example:  "2026-06-24T17:00:00.000Z"
-  // Output example: "2026-06-24 17:00:00.000Z"
   return iso.replace("T", " ");
 }
 
@@ -155,10 +129,6 @@ export type SinceResult = {
    */
   to: string;
 };
-
-// ---------------------------------------------------------------------------
-// resolveSince — parse duration string → select bucket → build SinceResult
-// ---------------------------------------------------------------------------
 
 /**
  * Full pipeline: parse the --since flag value, select the interval bucket,

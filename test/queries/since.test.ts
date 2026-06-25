@@ -9,10 +9,6 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { parseDuration, selectInterval, resolveSince, toPocketBaseDateTime } from "../../src/queries/since.js";
 import { CliError } from "../../src/types/errors.js";
 
-// ---------------------------------------------------------------------------
-// parseDuration
-// ---------------------------------------------------------------------------
-
 describe("parseDuration", () => {
   it("parses seconds: 90s → 90000ms", () => {
     expect(parseDuration("90s")).toBe(90_000);
@@ -66,10 +62,6 @@ describe("parseDuration", () => {
     expect(() => parseDuration("100")).toThrow(CliError);
   });
 });
-
-// ---------------------------------------------------------------------------
-// selectInterval — bucket selection
-// ---------------------------------------------------------------------------
 
 describe("selectInterval", () => {
   const MS = {
@@ -126,10 +118,6 @@ describe("selectInterval", () => {
     stderrSpy.mockRestore();
   });
 });
-
-// ---------------------------------------------------------------------------
-// resolveSince — full pipeline
-// ---------------------------------------------------------------------------
 
 describe("resolveSince", () => {
   const FIXED_NOW = new Date("2026-06-24T14:00:00.000Z");

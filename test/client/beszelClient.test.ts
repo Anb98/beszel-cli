@@ -28,10 +28,6 @@ import { CliError } from "../../src/types/errors.js";
 import type { BeszelConfig } from "../../src/client/config.js";
 import { getCachePath, writeCache } from "../../src/client/tokenCache.js";
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
 const BASE_URL = "http://beszel.test";
 const AUTH_PATH = "/api/collections/_superusers/auth-with-password";
 const RECORDS_PATH = "/api/collections/systems/records";
@@ -43,10 +39,6 @@ const VALID_CONFIG: BeszelConfig = {
   authCollection: "_superusers",
 };
 
-// ---------------------------------------------------------------------------
-// Helper: build a minimal JWT with a given exp
-// ---------------------------------------------------------------------------
-
 function buildJwt(exp: number): string {
   const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");
   const payload = Buffer.from(JSON.stringify({ sub: "user", exp })).toString("base64url");
@@ -56,11 +48,6 @@ function buildJwt(exp: number): string {
 const FUTURE_EXP = Math.floor(Date.now() / 1000) + 7 * 24 * 3600; // 7 days
 const VALID_TOKEN = buildJwt(FUTURE_EXP);
 
-// ---------------------------------------------------------------------------
-// MSW server setup
-// ---------------------------------------------------------------------------
-
-// Default handlers — can be overridden per-test via server.use()
 const defaultHandlers = [
   http.post(`${BASE_URL}${AUTH_PATH}`, () => {
     return HttpResponse.json({ token: VALID_TOKEN, record: { id: "usr1", email: "admin@example.com" } });
@@ -75,10 +62,6 @@ const server = setupServer(...defaultHandlers);
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 afterAll(() => server.close());
 
-// ---------------------------------------------------------------------------
-// Temp home dir so tests never touch the real ~/.cache
-// ---------------------------------------------------------------------------
-
 let tmpDir: string;
 
 beforeEach(() => {
@@ -91,10 +74,6 @@ afterEach(() => {
   vi.restoreAllMocks();
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 describe("BeszelClient.authenticate()", () => {
   it("calls auth endpoint and returns a token on success (cold cache)", async () => {

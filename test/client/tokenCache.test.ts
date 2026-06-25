@@ -25,20 +25,11 @@ import {
   getCachePath,
 } from "../../src/client/tokenCache.js";
 
-// ---------------------------------------------------------------------------
-// Helper: build a minimal JWT with a given exp (no real signing)
-// ---------------------------------------------------------------------------
-
 function buildJwt(exp: number): string {
   const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");
   const payload = Buffer.from(JSON.stringify({ sub: "user", exp })).toString("base64url");
   return `${header}.${payload}.fakesignature`;
 }
-
-// ---------------------------------------------------------------------------
-// Override cache path so tests never touch the real home directory.
-// We monkey-patch os.homedir() via vi.spyOn.
-// ---------------------------------------------------------------------------
 
 let tmpDir: string;
 
@@ -51,10 +42,6 @@ afterEach(() => {
   vi.restoreAllMocks();
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
-
-// ---------------------------------------------------------------------------
-// decodeJwtExp
-// ---------------------------------------------------------------------------
 
 describe("decodeJwtExp", () => {
   it("decodes a valid JWT exp", () => {
@@ -77,10 +64,6 @@ describe("decodeJwtExp", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// isTokenValid
-// ---------------------------------------------------------------------------
-
 describe("isTokenValid", () => {
   it("returns true for a far-future exp", () => {
     const futureSec = Math.floor(Date.now() / 1000) + 3600;
@@ -98,10 +81,6 @@ describe("isTokenValid", () => {
     expect(isTokenValid(soonSec)).toBe(false);
   });
 });
-
-// ---------------------------------------------------------------------------
-// readCache / writeCache / clearCache
-// ---------------------------------------------------------------------------
 
 const SCOPE = {
   url: "https://beszel.example.com",

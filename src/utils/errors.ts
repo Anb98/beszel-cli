@@ -13,10 +13,6 @@
 import { CliError, EXIT_CODES } from "../types/errors.js";
 import type { ErrorEnvelope } from "../types/output.js";
 
-// ---------------------------------------------------------------------------
-// HandleErrorOptions
-// ---------------------------------------------------------------------------
-
 export type HandleErrorOptions = {
   /**
    * When true (--json flag or non-TTY), emit the error envelope to STDOUT.
@@ -24,10 +20,6 @@ export type HandleErrorOptions = {
    */
   json: boolean;
 };
-
-// ---------------------------------------------------------------------------
-// handleError — public API
-// ---------------------------------------------------------------------------
 
 /**
  * Catch-all error handler. Call from the top-level CLI entry point after any
@@ -51,10 +43,6 @@ export function handleError(err: unknown, opts: HandleErrorOptions): void {
 
   process.exitCode = exitCode;
 }
-
-// ---------------------------------------------------------------------------
-// Internal helpers
-// ---------------------------------------------------------------------------
 
 function buildEnvelope(err: unknown): ErrorEnvelope {
   if (err instanceof CliError) {

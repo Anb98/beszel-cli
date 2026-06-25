@@ -11,10 +11,6 @@
  *   OPTIONAL  — present only when upstream provides the source key; never null
  */
 
-// ---------------------------------------------------------------------------
-// Supporting types
-// ---------------------------------------------------------------------------
-
 export type FieldStability = "stable" | "optional";
 
 export type FieldDef = {
@@ -45,10 +41,6 @@ export type CommandContract = {
   examples: Record<string, string>;
 };
 
-// ---------------------------------------------------------------------------
-// Global flags — inherited by every subcommand via Commander .optsWithGlobals()
-// ---------------------------------------------------------------------------
-
 export const GLOBAL_FLAGS: FlagDef[] = [
   {
     flag: "--json",
@@ -64,10 +56,6 @@ export const GLOBAL_FLAGS: FlagDef[] = [
     description: "Disable token cache; always re-authenticate.",
   },
 ];
-
-// ---------------------------------------------------------------------------
-// Exit codes (design R5)
-// ---------------------------------------------------------------------------
 
 export type ExitCodeDef = {
   code: number;
@@ -100,10 +88,6 @@ export const EXIT_CODE_TABLE: ExitCodeDef[] = [
   },
 ];
 
-// ---------------------------------------------------------------------------
-// Error envelope schema
-// ---------------------------------------------------------------------------
-
 export const ERROR_ENVELOPE_SCHEMA = `{
   "error": {
     "code":    "<string — machine-readable ErrorCode>",
@@ -111,10 +95,6 @@ export const ERROR_ENVELOPE_SCHEMA = `{
     "hint":    "<string — actionable suggestion>"
   }
 }`;
-
-// ---------------------------------------------------------------------------
-// Environment variables
-// ---------------------------------------------------------------------------
 
 export const ENV_VARS: Array<{ name: string; required: boolean; description: string }> = [
   { name: "BESZEL_URL", required: true, description: "Hub URL, e.g. https://beszel.example.com" },
@@ -127,16 +107,8 @@ export const ENV_VARS: Array<{ name: string; required: boolean; description: str
   },
 ];
 
-// ---------------------------------------------------------------------------
-// Supported Beszel version range
-// ---------------------------------------------------------------------------
-
 /** Single constant — must match SUPPORTED_BESZEL in src/client/beszelClient.ts */
 export const SUPPORTED_BESZEL_RANGE = ">=0.18 <0.19";
-
-// ---------------------------------------------------------------------------
-// Command contracts
-// ---------------------------------------------------------------------------
 
 const systemsContract: CommandContract = {
   name: "systems",
@@ -356,10 +328,6 @@ const healthContract: CommandContract = {
     "Human TTY report": "beszel health",
   },
 };
-
-// ---------------------------------------------------------------------------
-// Registry — ordered list of all commands
-// ---------------------------------------------------------------------------
 
 export const COMMAND_REGISTRY: CommandContract[] = [
   systemsContract,

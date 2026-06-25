@@ -9,10 +9,6 @@ import React from "react";
 import { Box, Text, render } from "ink";
 import type { DisksOutput, DeviceInfo, DiskInfo, RaidInfo } from "../../types/output.js";
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 function useColor(): boolean {
   return !process.env["NO_COLOR"];
 }
@@ -60,10 +56,6 @@ function truncate(s: string | null | undefined, width: number): string {
   if (!s) return "-".padEnd(width);
   return s.length > width ? s.slice(0, width - 1) + "…" : s.padEnd(width);
 }
-
-// ---------------------------------------------------------------------------
-// Disk row (SMART physical drive)
-// ---------------------------------------------------------------------------
 
 type DiskRowProps = {
   item: DiskInfo;
@@ -120,10 +112,6 @@ function DiskRow({ item, colorEnabled }: DiskRowProps): React.ReactElement {
   );
 }
 
-// ---------------------------------------------------------------------------
-// RAID row
-// ---------------------------------------------------------------------------
-
 type RaidRowProps = {
   item: RaidInfo;
   colorEnabled: boolean;
@@ -162,10 +150,6 @@ function RaidRow({ item, colorEnabled }: RaidRowProps): React.ReactElement {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Group by system
-// ---------------------------------------------------------------------------
-
 function groupBySystem(devices: DeviceInfo[]): Map<string, DeviceInfo[]> {
   const map = new Map<string, DeviceInfo[]>();
   for (const d of devices) {
@@ -176,10 +160,6 @@ function groupBySystem(devices: DeviceInfo[]): Map<string, DeviceInfo[]> {
   }
   return map;
 }
-
-// ---------------------------------------------------------------------------
-// DisksList root component
-// ---------------------------------------------------------------------------
 
 type DisksListProps = {
   data: DisksOutput;
@@ -224,10 +204,6 @@ export function DisksList({ data }: DisksListProps): React.ReactElement {
     </Box>
   );
 }
-
-// ---------------------------------------------------------------------------
-// renderDisksList — dynamic-import entry point
-// ---------------------------------------------------------------------------
 
 export async function renderDisksList(data: DisksOutput): Promise<void> {
   const { waitUntilExit } = render(<DisksList data={data} />);

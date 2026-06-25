@@ -25,10 +25,6 @@ import {
 } from "../types/upstream.js";
 import { CliError } from "../types/errors.js";
 
-// ---------------------------------------------------------------------------
-// resolveSystem — name|id → SystemRecord
-// ---------------------------------------------------------------------------
-
 /**
  * Resolve a name-or-id argument to a single system record.
  *
@@ -41,7 +37,6 @@ async function resolveSystem(
 ) {
   const ListSchema = PocketBaseListSchema(SystemRecordSchema);
 
-  // Fetch all systems (name sort, up to 500).
   const raw = await client.listRecords("systems", {
     sort: "name",
     perPage: 500,
@@ -51,7 +46,6 @@ async function resolveSystem(
   const parsed = ListSchema.parse(raw);
   const allSystems = parsed.items;
 
-  // Step 1: case-insensitive exact name match.
   const lowerArg = nameOrId.toLowerCase();
   const nameMatches = allSystems.filter(
     (s) => s.name.toLowerCase() === lowerArg,
@@ -70,21 +64,15 @@ async function resolveSystem(
     return nameMatches[0]!;
   }
 
-  // Step 2: fallback — exact id match.
   const idMatch = allSystems.find((s) => s.id === nameOrId);
   if (idMatch) return idMatch;
 
-  // Nothing matched.
   throw new CliError(
     "NOT_FOUND",
     `No system found matching name or id "${nameOrId}".`,
     `Run "beszel systems --json" to list available systems and their ids.`,
   );
 }
-
-// ---------------------------------------------------------------------------
-// fetchSystem — public API: resolve + merge system_details
-// ---------------------------------------------------------------------------
 
 /**
  * Fetch one system by name or id, merging the live snapshot with system_details.
@@ -100,7 +88,6 @@ export async function fetchSystem(
   const record = await resolveSystem(client, nameOrId);
   const system = mapSystemDetail(record);
 
-  // Fetch system_details for this system id.
   // system_details id == system id (verified via live recon #472).
   const DetailsListSchema = PocketBaseListSchema(SystemDetailsRecordSchema);
 

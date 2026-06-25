@@ -12,10 +12,6 @@
 import { z } from "zod";
 import { CliError } from "../types/errors.js";
 
-// ---------------------------------------------------------------------------
-// Zod schema for the expected environment variables
-// ---------------------------------------------------------------------------
-
 const ConfigSchema = z.looseObject({
   /** Full base URL of the Beszel hub, e.g. https://beszel.example.com */
   BESZEL_URL: z.string().url({
@@ -33,20 +29,12 @@ const ConfigSchema = z.looseObject({
   BESZEL_AUTH_COLLECTION: z.string().optional(),
 });
 
-// ---------------------------------------------------------------------------
-// Exported config shape
-// ---------------------------------------------------------------------------
-
 export type BeszelConfig = {
   url: string;
   email: string;
   password: string;
   authCollection: string;
 };
-
-// ---------------------------------------------------------------------------
-// loadConfig — parse process.env; throws CliError on any validation failure
-// ---------------------------------------------------------------------------
 
 /**
  * Reads the four Beszel env vars from `process.env` (or an override map for
@@ -61,7 +49,6 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
   const result = ConfigSchema.safeParse(env);
 
   if (!result.success) {
-    // Collect the first failing path for a precise human message.
     const firstIssue = result.error.issues[0];
     const varName = String(firstIssue?.path?.[0] ?? "BESZEL_*");
     const detail = firstIssue?.message ?? "validation failed";

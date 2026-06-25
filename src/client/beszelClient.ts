@@ -22,10 +22,6 @@ import {
 } from "./tokenCache.js";
 import type { CachedToken } from "./tokenCache.js";
 
-// ---------------------------------------------------------------------------
-// Version range
-// ---------------------------------------------------------------------------
-
 /**
  * The single Beszel agent/hub version range this CLI is validated against.
  * Out-of-range versions emit a stderr warning but never cause a non-zero exit.
@@ -59,10 +55,6 @@ export function checkVersion(observedVersion: string | undefined): void {
   }
 }
 
-// ---------------------------------------------------------------------------
-// PocketBase list query options
-// ---------------------------------------------------------------------------
-
 export type ListOptions = {
   filter?: string;
   sort?: string;
@@ -73,10 +65,6 @@ export type ListOptions = {
   skipTotal?: boolean;
 };
 
-// ---------------------------------------------------------------------------
-// PocketBase auth response shape (minimal — only what we need)
-// ---------------------------------------------------------------------------
-
 type AuthResponse = {
   token: string;
   record?: {
@@ -84,10 +72,6 @@ type AuthResponse = {
     email?: string;
   };
 };
-
-// ---------------------------------------------------------------------------
-// BeszelClient
-// ---------------------------------------------------------------------------
 
 export class BeszelClient {
   private readonly config: BeszelConfig;
@@ -99,10 +83,6 @@ export class BeszelClient {
     this.noCache = noCache;
   }
 
-  // -------------------------------------------------------------------------
-  // authenticate — obtain a valid token (from cache or fresh login)
-  // -------------------------------------------------------------------------
-
   /**
    * Ensure we have a valid token. If the cache holds a non-expired token
    * scoped to the current url/collection/email, it is reused. Otherwise,
@@ -112,7 +92,6 @@ export class BeszelClient {
    * @throws {CliError} NETWORK_ERROR if the auth endpoint is unreachable.
    */
   async authenticate(): Promise<string> {
-    // 1. Try the cache first.
     const cached = readCache({
       noCache: this.noCache,
       url: this.config.url,
@@ -125,14 +104,9 @@ export class BeszelClient {
       return this.token;
     }
 
-    // 2. Fresh auth call.
     this.token = await this.doAuthenticate();
     return this.token;
   }
-
-  // -------------------------------------------------------------------------
-  // doAuthenticate — make the actual POST request
-  // -------------------------------------------------------------------------
 
   private async doAuthenticate(): Promise<string> {
     const url = `${this.config.url}/api/collections/${this.config.authCollection}/auth-with-password`;
@@ -166,7 +140,6 @@ export class BeszelClient {
     }
 
     if (!response.ok) {
-      // 5xx or unexpected error.
       throw new CliError(
         "NETWORK_ERROR",
         `Beszel hub returned HTTP ${response.status} during authentication.`,
@@ -207,10 +180,6 @@ export class BeszelClient {
     return data.token;
   }
 
-  // -------------------------------------------------------------------------
-  // request — authenticated GET with lazy 401 re-auth
-  // -------------------------------------------------------------------------
-
   /**
    * Make an authenticated GET request. On 401, clears the cache, re-auths
    * once, and retries. A second 401 throws AUTH_FAILED exit 2.
@@ -243,14 +212,12 @@ export class BeszelClient {
 
     if (response.status === 401) {
       if (isRetry) {
-        // Second 401 after re-auth — bail out.
         throw new CliError(
           "AUTH_FAILED",
           `Authentication failed on retry (HTTP 401). Session may have expired.`,
           `Try clearing the token cache or re-checking credentials.`,
         );
       }
-      // Clear stale token and re-authenticate once.
       clearCache();
       this.token = await this.doAuthenticate();
       return this.request<T>(path, true);
@@ -283,10 +250,6 @@ export class BeszelClient {
     }
   }
 
-  // -------------------------------------------------------------------------
-  // listRecords — build PocketBase query string + GET /api/collections/{c}/records
-  // -------------------------------------------------------------------------
-
   /**
    * Fetch a page of records from a PocketBase collection, applying optional
    * filter, sort, fields, pagination, and skipTotal parameters.
@@ -310,10 +273,6 @@ export class BeszelClient {
     return this.request<T>(path);
   }
 }
-
-// ---------------------------------------------------------------------------
-// Factory helper — creates a fully-authenticated client in one call
-// ---------------------------------------------------------------------------
 
 /**
  * Build a {@link BeszelClient} from config and ensure a valid token is

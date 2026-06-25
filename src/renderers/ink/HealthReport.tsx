@@ -13,10 +13,6 @@ import React from "react";
 import { Box, Text, render } from "ink";
 import type { HealthReport as HealthReportData, HealthIssue, IssueSeverity } from "../../types/output.js";
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 function useColor(): boolean {
   return !process.env["NO_COLOR"];
 }
@@ -48,10 +44,6 @@ function kindLabel(kind: string): string {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Issue row
-// ---------------------------------------------------------------------------
-
 type IssueRowProps = {
   issue: HealthIssue;
   colorEnabled: boolean;
@@ -69,10 +61,6 @@ function IssueRow({ issue, colorEnabled }: IssueRowProps): React.ReactElement {
   );
 }
 
-// ---------------------------------------------------------------------------
-// HealthReport root component
-// ---------------------------------------------------------------------------
-
 type HealthReportComponentProps = {
   data: HealthReportData;
 };
@@ -81,7 +69,6 @@ export function HealthReportComponent({ data }: HealthReportComponentProps): Rea
   const colorEnabled = useColor();
   const { healthy, issues, checked } = data;
 
-  // Group issues by severity for ordered display (crits first)
   const crits = issues.filter((i) => i.severity === "crit");
   const warns = issues.filter((i) => i.severity === "warn");
 
@@ -138,10 +125,6 @@ export function HealthReportComponent({ data }: HealthReportComponentProps): Rea
     </Box>
   );
 }
-
-// ---------------------------------------------------------------------------
-// renderHealthReport — dynamic-import entry point
-// ---------------------------------------------------------------------------
 
 export async function renderHealthReport(data: HealthReportData): Promise<void> {
   const { waitUntilExit } = render(<HealthReportComponent data={data} />);

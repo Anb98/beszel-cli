@@ -15,10 +15,6 @@ import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 
-// ---------------------------------------------------------------------------
-// Keys that are ONLY allowed in key-map.ts (and upstream type declarations)
-// ---------------------------------------------------------------------------
-
 /**
  * These are the abbreviated upstream field names from Beszel's PocketBase API
  * (provenance: live recon #472, Beszel v0.18.7 — undocumented).
@@ -41,18 +37,10 @@ const ABBREVIATED_KEYS = [
   "mb",  // → memBufCacheGB
 ] as const;
 
-// ---------------------------------------------------------------------------
-// Files that are EXEMPT from this check (they intentionally declare the keys)
-// ---------------------------------------------------------------------------
-
 const EXEMPT_FILES = new Set([
   "mapping/key-map.ts",
   "types/upstream.ts",
 ]);
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 function collectTsFiles(dir: string, relBase: string): Array<{ abs: string; rel: string }> {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -117,18 +105,10 @@ function isInsideDescriptionString(line: string, key: string): boolean {
   return prosePattern.test(line);
 }
 
-// ---------------------------------------------------------------------------
-// Locate src/
-// ---------------------------------------------------------------------------
-
 const srcDir = path.resolve(
   import.meta.dirname ?? path.dirname(new URL(import.meta.url).pathname),
   "../../src",
 );
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 describe("Key-map centralization boundary", () => {
   it("abbreviated upstream keys are not accessed outside key-map.ts", () => {

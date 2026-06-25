@@ -22,10 +22,6 @@ import type { BeszelConfig } from "../../src/client/config.js";
 import containersFixture from "../fixtures/containers.json" with { type: "json" };
 import systemsFixture from "../fixtures/systems.json" with { type: "json" };
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
 const BASE_URL = "http://beszel-containers-cmd.test";
 const VALID_CONFIG: BeszelConfig = {
   url: BASE_URL,
@@ -41,10 +37,6 @@ function buildJwt(exp: number): string {
   return `${h}.${p}.sig`;
 }
 const TOKEN = buildJwt(Math.floor(Date.now() / 1000) + 7 * 86400);
-
-// ---------------------------------------------------------------------------
-// MSW server
-// ---------------------------------------------------------------------------
 
 const server = setupServer(
   http.post(`${BASE_URL}${AUTH_PATH}`, () =>
@@ -67,10 +59,6 @@ async function makeClient(): Promise<BeszelClient> {
   await client.authenticate();
   return client;
 }
-
-// ---------------------------------------------------------------------------
-// Tests — REQ-5
-// ---------------------------------------------------------------------------
 
 describe("beszel containers — REQ-5", () => {
   describe("happy path — list all containers", () => {

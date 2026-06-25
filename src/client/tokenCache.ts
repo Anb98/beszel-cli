@@ -20,10 +20,6 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
 /** Clock skew buffer — tokens expiring within 60 s are considered expired. */
 const TOKEN_SKEW_MS = 60_000;
 
@@ -32,10 +28,6 @@ const CACHE_FILE_NAME = "token.json";
 
 /** Directory under ~/.cache where the token lives. */
 const CACHE_DIR_NAME = "beszel-cli";
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
 
 /**
  * Shape persisted to token.json.
@@ -54,10 +46,6 @@ export type CachedToken = {
   email: string;
 };
 
-// ---------------------------------------------------------------------------
-// Path helpers
-// ---------------------------------------------------------------------------
-
 /** Absolute path to ~/.cache/beszel-cli/token.json */
 export function getCachePath(): string {
   return path.join(os.homedir(), ".cache", CACHE_DIR_NAME, CACHE_FILE_NAME);
@@ -68,10 +56,6 @@ function getCacheDir(): string {
   return path.join(os.homedir(), ".cache", CACHE_DIR_NAME);
 }
 
-// ---------------------------------------------------------------------------
-// JWT exp decoder — NO signature verification, payload only
-// ---------------------------------------------------------------------------
-
 /**
  * Decode the `exp` claim from a JWT payload (middle segment) without
  * verifying the signature. Returns `0` if decoding fails so the token is
@@ -81,7 +65,6 @@ export function decodeJwtExp(token: string): number {
   try {
     const parts = token.split(".");
     if (parts.length < 2) return 0;
-    // Base64url → Base64 → JSON
     const payload = parts[1]!.replace(/-/g, "+").replace(/_/g, "/");
     const decoded = JSON.parse(Buffer.from(payload, "base64").toString("utf8")) as unknown;
     if (typeof decoded === "object" && decoded !== null && "exp" in decoded) {
@@ -94,10 +77,6 @@ export function decodeJwtExp(token: string): number {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Expiry check
-// ---------------------------------------------------------------------------
-
 /**
  * Returns `true` if the token is still valid (not expired + skew buffer).
  * @param expUnixSeconds - The `exp` claim from the JWT (Unix seconds).
@@ -105,10 +84,6 @@ export function decodeJwtExp(token: string): number {
 export function isTokenValid(expUnixSeconds: number): boolean {
   return expUnixSeconds * 1000 - TOKEN_SKEW_MS > Date.now();
 }
-
-// ---------------------------------------------------------------------------
-// read — returns a valid CachedToken or null on any failure
-// ---------------------------------------------------------------------------
 
 /**
  * Read and validate the cached token. Returns `null` if:
@@ -164,10 +139,6 @@ export function readCache(opts: {
   }
 }
 
-// ---------------------------------------------------------------------------
-// write — persist a fresh token; silently ignores I/O errors
-// ---------------------------------------------------------------------------
-
 /**
  * Write a fresh token to the cache file (mode 0600). Creates the cache
  * directory (mode 0700) if it does not exist.
@@ -190,10 +161,6 @@ export function writeCache(entry: CachedToken, noCache: boolean): void {
     // Silently ignore — cache miss on next run is acceptable.
   }
 }
-
-// ---------------------------------------------------------------------------
-// clearCache — remove the token file; called on 401 mid-session
-// ---------------------------------------------------------------------------
 
 /**
  * Remove the cached token file. Called when the server returns 401 so the

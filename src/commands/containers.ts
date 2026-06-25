@@ -18,10 +18,6 @@ import { emit, resolveMode, type RenderCallback } from "../utils/output.js";
 import { handleError } from "../utils/errors.js";
 import type { ContainersOutput } from "../types/output.js";
 
-// ---------------------------------------------------------------------------
-// registerContainers — attach the `containers` subcommand to a Commander program
-// ---------------------------------------------------------------------------
-
 export function registerContainers(program: Command): void {
   program
     .command("containers")
@@ -52,7 +48,6 @@ export function registerContainers(program: Command): void {
           const config = loadConfig();
           const client = await createClient(config, globalOpts.noCache ?? false);
 
-          // Validate --sort value.
           const sortField =
             opts.sort === "memory" ? "memory" : "cpu";
 
@@ -62,7 +57,6 @@ export function registerContainers(program: Command): void {
             system: opts.system,
           });
 
-          // TTY renderer — loaded dynamically so Ink is never on the agent path.
           const renderer: RenderCallback<ContainersOutput> = async (data) => {
             const { renderContainersList } = await import("../renderers/ink/ContainersList.js");
             await renderContainersList(data);

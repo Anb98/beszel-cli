@@ -11,10 +11,6 @@ import React from "react";
 import { Box, Text, render } from "ink";
 import type { SystemsOutput, SystemItem } from "../../types/output.js";
 
-// ---------------------------------------------------------------------------
-// Color helpers — respect NO_COLOR env
-// ---------------------------------------------------------------------------
-
 function useColor(): boolean {
   return !process.env["NO_COLOR"];
 }
@@ -31,10 +27,6 @@ function statusColor(status: string): string {
       return "gray";
   }
 }
-
-// ---------------------------------------------------------------------------
-// Formatting helpers
-// ---------------------------------------------------------------------------
 
 function fmtPct(v: number | null): string {
   if (v == null) return "-";
@@ -60,10 +52,6 @@ function fmtAgent(v: string | null): string {
   return v ?? "-";
 }
 
-// ---------------------------------------------------------------------------
-// Column definitions
-// ---------------------------------------------------------------------------
-
 const COL_WIDTHS = {
   name: 18,
   status: 8,
@@ -78,10 +66,6 @@ const COL_WIDTHS = {
 function pad(s: string, width: number): string {
   return s.length >= width ? s.slice(0, width) : s + " ".repeat(width - s.length);
 }
-
-// ---------------------------------------------------------------------------
-// Row component
-// ---------------------------------------------------------------------------
 
 type RowProps = {
   item: SystemItem;
@@ -105,10 +89,6 @@ function Row({ item, useColorOutput }: RowProps): React.ReactElement {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Header component
-// ---------------------------------------------------------------------------
-
 function Header(): React.ReactElement {
   return (
     <Box>
@@ -124,10 +104,6 @@ function Header(): React.ReactElement {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Divider
-// ---------------------------------------------------------------------------
-
 function Divider(): React.ReactElement {
   const totalWidth =
     COL_WIDTHS.name +
@@ -140,10 +116,6 @@ function Divider(): React.ReactElement {
     COL_WIDTHS.agent;
   return <Text dimColor>{"─".repeat(totalWidth)}</Text>;
 }
-
-// ---------------------------------------------------------------------------
-// SystemsTable root component
-// ---------------------------------------------------------------------------
 
 type SystemsTableProps = {
   data: SystemsOutput;
@@ -176,10 +148,6 @@ export function SystemsTable({ data }: SystemsTableProps): React.ReactElement {
     </Box>
   );
 }
-
-// ---------------------------------------------------------------------------
-// renderSystemsTable — dynamic-import entry point for commands/systems.ts
-// ---------------------------------------------------------------------------
 
 /**
  * Called via dynamic import from the TTY branch in emit().

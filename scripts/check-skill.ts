@@ -24,11 +24,6 @@ import {
   type FlagDef,
 } from "../src/command-contract/registry.js";
 
-// ---------------------------------------------------------------------------
-// Inline renderer (copy of gen-skill logic — avoids a circular import cycle
-// when this script is run via tsx without a prior build step).
-// ---------------------------------------------------------------------------
-
 function mdTable(headers: string[], rows: string[][]): string {
   const colWidths = headers.map((h, i) =>
     Math.max(h.length, ...rows.map((r) => (r[i] ?? "").length)),
@@ -245,10 +240,6 @@ beszel health --disk-warn 80 --disk-crit 90 --strict --json
 \`\`\`
 `;
 }
-
-// ---------------------------------------------------------------------------
-// Staleness check
-// ---------------------------------------------------------------------------
 
 const __filename = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(__filename), "..");

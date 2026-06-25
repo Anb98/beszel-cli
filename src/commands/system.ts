@@ -21,10 +21,6 @@ import { emit, resolveMode, type RenderCallback } from "../utils/output.js";
 import { handleError } from "../utils/errors.js";
 import type { SystemOutput } from "../types/output.js";
 
-// ---------------------------------------------------------------------------
-// registerSystem — attach the `system` subcommand to a Commander program
-// ---------------------------------------------------------------------------
-
 export function registerSystem(program: Command): void {
   program
     .command("system <name>")
@@ -43,22 +39,18 @@ export function registerSystem(program: Command): void {
         const config = loadConfig();
         const client = await createClient(config, globalOpts.noCache ?? false);
 
-        // TTY renderer — loaded dynamically so Ink is never on the agent path.
         const renderer: RenderCallback<SystemOutput> = async (data) => {
           const { renderSystemDetail } = await import("../renderers/ink/SystemDetail.js");
           await renderSystemDetail(data);
         };
 
-        // Fetch system snapshot + system_details.
         const systemResult = await fetchSystem(client, nameArg);
 
         if (!opts.since) {
-          // No historical window — emit the snapshot directly.
           await emit(systemResult, { json, noColor: globalOpts.noColor, renderer });
           return;
         }
 
-        // --since: wrap in HistoricalEnvelope.
         const statsEnvelope = await fetchStats(client, {
           since: opts.since,
           systemId: systemResult.system.id,
@@ -69,8 +61,6 @@ export function registerSystem(program: Command): void {
           history: statsEnvelope,
         };
 
-        // For historical data, renderer receives the extended object; the
-        // SystemDetail component handles the optional history field.
         const rendererExtended = renderer as RenderCallback<typeof result>;
         await emit(result, { json, noColor: globalOpts.noColor, renderer: rendererExtended });
       } catch (err) {

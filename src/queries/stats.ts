@@ -29,10 +29,6 @@ import {
 } from "../types/upstream.js";
 import { resolveSince, toPocketBaseDateTime, type SinceResult } from "./since.js";
 
-// ---------------------------------------------------------------------------
-// StatsOptions
-// ---------------------------------------------------------------------------
-
 export type StatsOptions = {
   /**
    * Raw --since flag value (e.g. "12h"). Required for historical queries.
@@ -55,10 +51,6 @@ export type StatsOptions = {
   now?: Date;
 };
 
-// ---------------------------------------------------------------------------
-// StatsPoint — one time-series data point
-// ---------------------------------------------------------------------------
-
 export type StatsPoint = {
   /** ISO 8601 timestamp of the stats record's created field. */
   timestamp: string;
@@ -67,10 +59,6 @@ export type StatsPoint = {
   /** Per-container stats for this interval (only when includeContainers=true). */
   containers?: ContainerStatsOutput[];
 };
-
-// ---------------------------------------------------------------------------
-// fetchStats — public API
-// ---------------------------------------------------------------------------
 
 /**
  * Fetch historical time-series stats for one system over a --since window.
@@ -87,9 +75,6 @@ export async function fetchStats(
 
   const SysStatsListSchema = PocketBaseListSchema(SystemStatsRecordSchema);
 
-  // PocketBase filter: system id, type=interval, created >= from.
-  // system_stats DOES have `created` → sort by -created is valid.
-  //
   // CRITICAL: PocketBase datetime filter comparisons require the SPACE format
   // "YYYY-MM-DD HH:MM:SS.sssZ", NOT the ISO 8601 "T" format.
   // Proven via live smoke test (2026-06-24): T-format returns 0 rows; space
@@ -99,21 +84,19 @@ export async function fetchStats(
 
   const rawStats = await client.listRecords("system_stats", {
     filter: statsFilter,
-    sort: "-created",     // newest first; we reverse below for chronological order
+    sort: "-created",
     perPage: 500,
     skipTotal: true,
   });
 
   const parsedStats = SysStatsListSchema.parse(rawStats);
 
-  // Reverse to chronological order (oldest→newest).
   const statsRecords = parsedStats.items.slice().reverse();
 
   let containerStatsMap: Map<string, ContainerStatsOutput[]> = new Map();
   if (opts.includeContainers) {
     const ConStatsListSchema = PocketBaseListSchema(ContainerStatsRecordSchema);
 
-    // Same PocketBase space-format datetime requirement applies here.
     const conFilter = `system="${opts.systemId}" && type="${sinceResult.interval}" && created>="${toPocketBaseDateTime(sinceResult.from)}"`;
     const rawConStats = await client.listRecords("container_stats", {
       filter: conFilter,

@@ -13,10 +13,6 @@ import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 
-// ---------------------------------------------------------------------------
-// Directories that MUST remain Ink-free (source paths, not dist)
-// ---------------------------------------------------------------------------
-
 const INK_FREE_DIRS = [
   "client",
   "queries",
@@ -25,10 +21,6 @@ const INK_FREE_DIRS = [
   "health",
   "utils",
 ] as const;
-
-// ---------------------------------------------------------------------------
-// Patterns that violate the boundary
-// ---------------------------------------------------------------------------
 
 const VIOLATION_PATTERNS = [
   // Static ESM imports
@@ -43,10 +35,6 @@ const VIOLATION_PATTERNS = [
   /require\s*\(\s*['"]ink['"]/,
   /require\s*\(\s*['"]react['"]/,
 ];
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 /**
  * Recursively collect all .ts files under a directory (excludes .d.ts files
@@ -84,15 +72,7 @@ function findViolations(filePath: string): string[] {
   return violations;
 }
 
-// ---------------------------------------------------------------------------
-// Locate src/ relative to this test file
-// ---------------------------------------------------------------------------
-
 const srcDir = path.resolve(import.meta.dirname ?? path.dirname(new URL(import.meta.url).pathname), "../../src");
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 describe("Ink-free core boundary", () => {
   for (const dir of INK_FREE_DIRS) {

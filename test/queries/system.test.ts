@@ -17,10 +17,6 @@ import type { BeszelConfig } from "../../src/client/config.js";
 import systemsFixture from "../fixtures/systems.json" with { type: "json" };
 import systemDetailsFixture from "../fixtures/system_details.json" with { type: "json" };
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
 const BASE_URL = "http://beszel-system.test";
 const VALID_CONFIG: BeszelConfig = {
   url: BASE_URL,
@@ -37,10 +33,6 @@ function buildJwt(exp: number): string {
   return `${h}.${p}.sig`;
 }
 const VALID_TOKEN = buildJwt(Math.floor(Date.now() / 1000) + 7 * 86400);
-
-// ---------------------------------------------------------------------------
-// MSW server — default handlers
-// ---------------------------------------------------------------------------
 
 const defaultHandlers = [
   http.post(`${BASE_URL}${AUTH_PATH}`, () =>
@@ -63,19 +55,11 @@ afterEach(() => {
 });
 afterAll(() => server.close());
 
-// ---------------------------------------------------------------------------
-// Helper — create an authenticated client (noCache=true to skip disk I/O)
-// ---------------------------------------------------------------------------
-
 async function makeClient(): Promise<BeszelClient> {
   const client = new BeszelClient(VALID_CONFIG, true);
   await client.authenticate();
   return client;
 }
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 describe("fetchSystem", () => {
   describe("happy path — name match (case-insensitive)", () => {

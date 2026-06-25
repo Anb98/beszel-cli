@@ -24,10 +24,6 @@
 
 import { CliError } from "../types/errors.js";
 
-// ---------------------------------------------------------------------------
-// Defaults
-// ---------------------------------------------------------------------------
-
 const DEFAULTS = {
   diskWarn: 90,
   diskCrit: 95,
@@ -36,10 +32,6 @@ const DEFAULTS = {
   diskTempWarn: 55,
   diskTempCrit: 65,
 } as const;
-
-// ---------------------------------------------------------------------------
-// ThresholdFlags — flag values supplied by Commander (may be undefined)
-// ---------------------------------------------------------------------------
 
 export type ThresholdFlags = {
   diskWarn?: number;
@@ -51,10 +43,6 @@ export type ThresholdFlags = {
   strict?: boolean;
 };
 
-// ---------------------------------------------------------------------------
-// Thresholds — fully-resolved threshold configuration
-// ---------------------------------------------------------------------------
-
 export type Thresholds = {
   diskWarn: number;
   diskCrit: number;
@@ -65,10 +53,6 @@ export type Thresholds = {
   /** When true, severity.ts promotes all "warn" issues to "crit". */
   strict: boolean;
 };
-
-// ---------------------------------------------------------------------------
-// resolveThresholds — public API
-// ---------------------------------------------------------------------------
 
 /**
  * Resolve health thresholds with precedence: flag > env > default.
@@ -102,23 +86,17 @@ export function resolveThresholds(
     DEFAULTS.diskTempCrit,
   );
 
-  // --strict: flag wins; then BESZEL_STRICT=1; else false.
   const strict =
     flags.strict !== undefined
       ? Boolean(flags.strict)
       : env["BESZEL_STRICT"] === "1" || env["BESZEL_STRICT"] === "true";
 
-  // Validate crit >= warn for each pair.
   validatePair("disk", diskWarn, diskCrit);
   validatePair("temp", tempWarn, tempCrit);
   validatePair("disk-temp", diskTempWarn, diskTempCrit);
 
   return { diskWarn, diskCrit, tempWarn, tempCrit, diskTempWarn, diskTempCrit, strict };
 }
-
-// ---------------------------------------------------------------------------
-// Internal helpers
-// ---------------------------------------------------------------------------
 
 /**
  * Resolve a single threshold value: flag > env-string-parsed > fallback.

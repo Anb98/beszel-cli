@@ -31,10 +31,6 @@ import {
   SystemdServiceRecordSchema,
 } from "../../src/types/upstream.js";
 
-// ---------------------------------------------------------------------------
-// Fixtures loaded from test/fixtures/ — using real live-schema shapes
-// ---------------------------------------------------------------------------
-
 import systemsFixture from "../fixtures/systems.json" with { type: "json" };
 import systemStatsFixture from "../fixtures/system_stats.json" with { type: "json" };
 import containerStatsFixture from "../fixtures/container_stats.json" with { type: "json" };
@@ -43,10 +39,6 @@ import smartDevicesFixture from "../fixtures/smart_devices.json" with { type: "j
 import smartDevicesDegradedFixture from "../fixtures/smart_devices_degraded.json" with { type: "json" };
 import systemDetailsFixture from "../fixtures/system_details.json" with { type: "json" };
 import emptySysServicesFixture from "../fixtures/empty_systemd_services.json" with { type: "json" };
-
-// ---------------------------------------------------------------------------
-// REQ-10: unknown upstream key passthrough — Zod z.looseObject() idiom
-// ---------------------------------------------------------------------------
 
 describe("REQ-10: Zod schema resilience — unknown key passthrough", () => {
   it("SystemRecordSchema parses a record with extra unknown upstream fields", () => {
@@ -114,10 +106,6 @@ describe("REQ-10: Zod schema resilience — unknown key passthrough", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// T-1.6 A: mapSystem — round-trip + absent-field behavior
-// ---------------------------------------------------------------------------
-
 describe("mapSystem — round-trip mapping", () => {
   const homeLabRaw = systemsFixture.items[0];
   const parsedHomeLab = SystemRecordSchema.parse(homeLabRaw);
@@ -179,10 +167,6 @@ describe("mapSystem — round-trip mapping", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// T-1.6 B: mapSystemDetailsInfo
-// ---------------------------------------------------------------------------
-
 describe("mapSystemDetailsInfo — round-trip", () => {
   const raw = systemDetailsFixture.items[0];
   const parsed = SystemDetailsRecordSchema.parse(raw);
@@ -200,10 +184,6 @@ describe("mapSystemDetailsInfo — round-trip", () => {
     expect(result.podman).toBe(false);
   });
 });
-
-// ---------------------------------------------------------------------------
-// T-1.6 C: mapContainer
-// ---------------------------------------------------------------------------
 
 describe("mapContainer — round-trip", () => {
   const raw = containersFixture.items[0]; // nginx
@@ -233,10 +213,6 @@ describe("mapContainer — round-trip", () => {
     expect("ports" in result).toBe(false);
   });
 });
-
-// ---------------------------------------------------------------------------
-// T-1.6 D: mapSystemStats
-// ---------------------------------------------------------------------------
 
 describe("mapSystemStats — round-trip", () => {
   const raw = systemStatsFixture.items[0];
@@ -294,10 +270,6 @@ describe("mapSystemStats — round-trip", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// T-1.6 E: mapContainerStatsItem
-// ---------------------------------------------------------------------------
-
 describe("mapContainerStatsItem — round-trip", () => {
   it("maps abbreviated container stats keys n/c/m/b to canonical names", () => {
     const rawItem = containerStatsFixture.items[0].stats[0]; // nginx
@@ -317,10 +289,6 @@ describe("mapContainerStatsItem — round-trip", () => {
     expect(result.net).toBeNull();
   });
 });
-
-// ---------------------------------------------------------------------------
-// T-1.6 F: mapSmartDevice — physical disk
-// ---------------------------------------------------------------------------
 
 describe("mapSmartDevice — physical disk", () => {
   const rawSda = smartDevicesFixture.items[1]; // /dev/sda
@@ -354,10 +322,6 @@ describe("mapSmartDevice — physical disk", () => {
     }
   });
 });
-
-// ---------------------------------------------------------------------------
-// T-1.6 G: mapSmartDevice — mdraid array (clean + degraded)
-// ---------------------------------------------------------------------------
 
 describe("mapSmartDevice — mdraid array", () => {
   it("maps a clean mdraid array to RaidInfo with kind:raid", () => {
@@ -396,10 +360,6 @@ describe("mapSmartDevice — mdraid array", () => {
     expect("tempC" in result).toBe(false);
   });
 });
-
-// ---------------------------------------------------------------------------
-// T-1.6 H: mapTempInfo
-// ---------------------------------------------------------------------------
 
 describe("mapTempInfo — temperature mapping", () => {
   const homeLabSystem = SystemRecordSchema.parse(systemsFixture.items[0]);
@@ -442,10 +402,6 @@ describe("mapTempInfo — temperature mapping", () => {
     expect(result.sensors).toEqual({});
   });
 });
-
-// ---------------------------------------------------------------------------
-// T-1.6 I: Fixture schema validation — all fixtures parse cleanly
-// ---------------------------------------------------------------------------
 
 describe("Fixture schema validation — real shapes parse without error", () => {
   it("systems.json items all parse through SystemRecordSchema", () => {

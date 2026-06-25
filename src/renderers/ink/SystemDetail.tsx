@@ -12,19 +12,11 @@ import React from "react";
 import { Box, Text, render } from "ink";
 import type { SystemOutput, HistoricalEnvelope } from "../../types/output.js";
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 // The command may attach a `history` field to the system output when --since
 // is used. We handle it here via an extended type.
 type SystemDetailInput = SystemOutput & {
   history?: HistoricalEnvelope<Record<string, unknown>>;
 };
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 function useColor(): boolean {
   return !process.env["NO_COLOR"];
@@ -69,10 +61,6 @@ function fmtUptime(s: number | null): string {
   return `${mins}m`;
 }
 
-// ---------------------------------------------------------------------------
-// Field row — label: value
-// ---------------------------------------------------------------------------
-
 type FieldProps = {
   label: string;
   value: string;
@@ -88,10 +76,6 @@ function Field({ label, value, valueColor }: FieldProps): React.ReactElement {
     </Box>
   );
 }
-
-// ---------------------------------------------------------------------------
-// SystemDetailComponent
-// ---------------------------------------------------------------------------
 
 type SystemDetailComponentProps = {
   data: SystemDetailInput;
@@ -170,10 +154,6 @@ function SystemDetailComponent({ data }: SystemDetailComponentProps): React.Reac
     </Box>
   );
 }
-
-// ---------------------------------------------------------------------------
-// renderSystemDetail — dynamic-import entry point
-// ---------------------------------------------------------------------------
 
 export async function renderSystemDetail(data: SystemOutput): Promise<void> {
   const { waitUntilExit } = render(

@@ -23,10 +23,6 @@ import smartDevicesFixture from "../fixtures/smart_devices.json" with { type: "j
 import smartDevicesDegradedFixture from "../fixtures/smart_devices_degraded.json" with { type: "json" };
 import systemsFixture from "../fixtures/systems.json" with { type: "json" };
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
 const BASE_URL = "http://beszel-disks-cmd.test";
 const VALID_CONFIG: BeszelConfig = {
   url: BASE_URL,
@@ -42,10 +38,6 @@ function buildJwt(exp: number): string {
   return `${h}.${p}.sig`;
 }
 const TOKEN = buildJwt(Math.floor(Date.now() / 1000) + 7 * 86400);
-
-// ---------------------------------------------------------------------------
-// MSW server
-// ---------------------------------------------------------------------------
 
 const server = setupServer(
   http.post(`${BASE_URL}${AUTH_PATH}`, () =>
@@ -68,10 +60,6 @@ async function makeClient(): Promise<BeszelClient> {
   await client.authenticate();
   return client;
 }
-
-// ---------------------------------------------------------------------------
-// Tests — REQ-6
-// ---------------------------------------------------------------------------
 
 describe("beszel disks — REQ-6", () => {
   describe("mixed disk and RAID", () => {

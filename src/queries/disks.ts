@@ -25,20 +25,12 @@ import {
 } from "../types/upstream.js";
 import { CliError } from "../types/errors.js";
 
-// ---------------------------------------------------------------------------
-// DisksOptions
-// ---------------------------------------------------------------------------
-
 export type DisksOptions = {
   /** Filter to one system by name or id. When absent, queries the entire fleet. */
   system?: string;
   /** Filter to failing devices only (disk: state!="PASSED"; raid: not clean+idle). */
   failing?: boolean;
 };
-
-// ---------------------------------------------------------------------------
-// isFailing — determine whether a mapped DeviceInfo is failing
-// ---------------------------------------------------------------------------
 
 /**
  * A device is "failing" when:
@@ -56,10 +48,6 @@ function isFailing(device: DeviceInfo): boolean {
     return r.arrayState !== "clean" || r.syncAction !== "idle";
   }
 }
-
-// ---------------------------------------------------------------------------
-// resolveSystemId — name/id → system id (for server-side filter)
-// ---------------------------------------------------------------------------
 
 async function resolveSystemId(
   client: BeszelClient,
@@ -100,10 +88,6 @@ async function resolveSystemId(
     `Run "beszel systems --json" to list available systems and their ids.`,
   );
 }
-
-// ---------------------------------------------------------------------------
-// fetchDisks — public API
-// ---------------------------------------------------------------------------
 
 /**
  * Fetch smart_devices for the fleet (or a single system), map to DeviceInfo[].

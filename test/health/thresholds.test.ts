@@ -9,10 +9,6 @@ import { describe, it, expect } from "vitest";
 import { resolveThresholds } from "../../src/health/thresholds.js";
 import { CliError } from "../../src/types/errors.js";
 
-// ---------------------------------------------------------------------------
-// Default values
-// ---------------------------------------------------------------------------
-
 describe("resolveThresholds — defaults", () => {
   it("returns default diskWarn=90, diskCrit=95 when no flags or env", () => {
     const t = resolveThresholds({}, {});
@@ -37,10 +33,6 @@ describe("resolveThresholds — defaults", () => {
     expect(t.strict).toBe(false);
   });
 });
-
-// ---------------------------------------------------------------------------
-// Flag precedence
-// ---------------------------------------------------------------------------
 
 describe("resolveThresholds — flag > env > default", () => {
   it("flag overrides env for diskWarn", () => {
@@ -91,10 +83,6 @@ describe("resolveThresholds — flag > env > default", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// --strict flag and BESZEL_STRICT env
-// ---------------------------------------------------------------------------
-
 describe("resolveThresholds — strict", () => {
   it("strict=true when flag is set", () => {
     const t = resolveThresholds({ strict: true }, {});
@@ -126,10 +114,6 @@ describe("resolveThresholds — strict", () => {
     expect(t.strict).toBe(false);
   });
 });
-
-// ---------------------------------------------------------------------------
-// Validation: crit >= warn
-// ---------------------------------------------------------------------------
 
 describe("resolveThresholds — validation", () => {
   it("throws INVALID_THRESHOLD when diskCrit < diskWarn", () => {

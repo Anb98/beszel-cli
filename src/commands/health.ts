@@ -30,10 +30,6 @@ import { emit, resolveMode, type RenderCallback } from "../utils/output.js";
 import { handleError } from "../utils/errors.js";
 import type { HealthReport as HealthReportData } from "../types/output.js";
 
-// ---------------------------------------------------------------------------
-// registerHealth — attach the `health` subcommand to a Commander program
-// ---------------------------------------------------------------------------
-
 export function registerHealth(program: Command): void {
   program
     .command("health")
@@ -70,7 +66,6 @@ export function registerHealth(program: Command): void {
           const config = loadConfig();
           const client = await createClient(config, globalOpts.noCache ?? false);
 
-          // Resolve thresholds (flag > env > default).
           const thresholds = resolveThresholds({
             diskWarn: opts.diskWarn,
             diskCrit: opts.diskCrit,
@@ -81,20 +76,17 @@ export function registerHealth(program: Command): void {
             strict: opts.strict,
           });
 
-          // Fetch all fleet data in parallel.
           const [systemsResult, disksResult, tempsResult] = await Promise.all([
             fetchSystems(client),
             fetchDisks(client),
             fetchTemps(client),
           ]);
 
-          // Build sensor map from temps: systemName → sensors.
           const sensorsBySystem = new Map<string, Record<string, number>>();
           for (const tempInfo of tempsResult.systems) {
             sensorsBySystem.set(tempInfo.system, tempInfo.sensors);
           }
 
-          // Shape systems for the evaluator.
           const healthSystems: HealthSystem[] = systemsResult.systems.map(
             (s: SystemItem) => ({
               name: s.name,
@@ -105,14 +97,11 @@ export function registerHealth(program: Command): void {
             }),
           );
 
-          // Shape devices for the evaluator (already DeviceInfo from fetchDisks).
           const healthDevices: HealthDevice[] = disksResult.devices.map((d) => ({
             system: d.system,
             kind: d.kind,
-            // DiskInfo fields
             state: "state" in d ? d.state : undefined,
             tempC: "tempC" in d ? d.tempC : undefined,
-            // RaidInfo fields
             arrayState: "arrayState" in d ? d.arrayState : undefined,
             syncAction: "syncAction" in d ? d.syncAction : undefined,
           }));
@@ -120,7 +109,6 @@ export function registerHealth(program: Command): void {
           const report = evaluateHealth(healthSystems, healthDevices, thresholds);
           const exitCode = healthExitCode(report);
 
-          // TTY renderer — loaded dynamically so Ink is never on the agent path.
           const renderer: RenderCallback<HealthReportData> = async (data) => {
             const { renderHealthReport } = await import("../renderers/ink/HealthReport.js");
             await renderHealthReport(data);

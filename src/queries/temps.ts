@@ -24,18 +24,10 @@ import {
 } from "../types/upstream.js";
 import type { SmartDeviceRecord, SystemStatsRecord } from "../types/upstream.js";
 
-// ---------------------------------------------------------------------------
-// TempsOptions
-// ---------------------------------------------------------------------------
-
 export type TempsOptions = {
   /** When true, merge smart_devices.temp into the sensors map. */
   disks?: boolean;
 };
-
-// ---------------------------------------------------------------------------
-// fetchTemps — public API
-// ---------------------------------------------------------------------------
 
 /**
  * Fetch temperature data for all systems.
@@ -51,7 +43,6 @@ export async function fetchTemps(
   const SysListSchema = PocketBaseListSchema(SystemRecordSchema);
   const StatsListSchema = PocketBaseListSchema(SystemStatsRecordSchema);
 
-  // 1. Fetch all systems.
   const sysRaw = await client.listRecords("systems", {
     sort: "name",
     perPage: 500,
@@ -60,9 +51,7 @@ export async function fetchTemps(
   const sysParsed = SysListSchema.parse(sysRaw);
   const allSystems = sysParsed.items;
 
-  // 2. Fetch the newest 1m system_stats records (one per system).
-  //    system_stats DOES have `created` → sort -created is valid.
-  //    We fetch up to 500 (enough to cover all systems with perPage).
+  // system_stats DOES have `created` → sort -created is valid here.
   const statsRaw = await client.listRecords("system_stats", {
     filter: `type="1m"`,
     sort: "-created",
@@ -71,8 +60,6 @@ export async function fetchTemps(
   });
   const statsParsed = StatsListSchema.parse(statsRaw);
 
-  // Build a map: systemId → newest 1m stats record.
-  // Since we sort by -created, the first record per system is the newest.
   const statsMap: Map<string, SystemStatsRecord> = new Map();
   for (const record of statsParsed.items) {
     if (!statsMap.has(record.system)) {
@@ -80,8 +67,7 @@ export async function fetchTemps(
     }
   }
 
-  // 3. Optionally fetch smart_devices for disk temps.
-  //    smart_devices has NO `created` → sort by -updated.
+  // smart_devices has NO `created` → sort by -updated.
   let diskMap: Map<string, SmartDeviceRecord[]> = new Map();
   if (opts.disks) {
     const SmartListSchema = PocketBaseListSchema(SmartDeviceRecordSchema);
@@ -100,7 +86,6 @@ export async function fetchTemps(
     }
   }
 
-  // 4. Build TempInfo for each system.
   const systems: TempInfo[] = allSystems.map((sysRecord) => {
     const statsRecord = statsMap.get(sysRecord.id) ?? null;
     const diskRecords = opts.disks ? (diskMap.get(sysRecord.id) ?? []) : undefined;

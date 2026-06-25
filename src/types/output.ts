@@ -9,10 +9,6 @@
  * Optional fields: present only when the upstream snapshot includes the source key.
  */
 
-// ---------------------------------------------------------------------------
-// Shared domain unions
-// ---------------------------------------------------------------------------
-
 /** System lifecycle state reported by the Beszel agent. */
 export type SystemStatus = "up" | "down" | "paused" | "pending";
 
@@ -53,10 +49,6 @@ export type RaidArrayState = "clean" | "degraded" | "failed" | "inactive" | "wri
  */
 export type RaidSyncAction = "idle" | "resync" | "recover" | "recovery" | "check" | "repair" | "reshape" | (string & {});
 
-// ---------------------------------------------------------------------------
-// REQ-3: systems command output
-// ---------------------------------------------------------------------------
-
 /** One system in the fleet listing. */
 export type SystemItem = {
   // --- stable-mandatory ---
@@ -88,10 +80,6 @@ export type SystemItem = {
 export type SystemsOutput = {
   systems: SystemItem[];
 };
-
-// ---------------------------------------------------------------------------
-// REQ-4: system <name> command output
-// ---------------------------------------------------------------------------
 
 /** Detailed system info (merged snapshot + system_details). */
 export type SystemDetail = {
@@ -135,10 +123,6 @@ export type SystemOutput = {
   details: SystemDetailsInfo | null;
 };
 
-// ---------------------------------------------------------------------------
-// REQ-5: containers command output
-// ---------------------------------------------------------------------------
-
 export type ContainerInfo = {
   // --- stable ---
   name: string;
@@ -162,10 +146,6 @@ export type ContainerInfo = {
 export type ContainersOutput = {
   containers: ContainerInfo[];
 };
-
-// ---------------------------------------------------------------------------
-// REQ-6: disks command output
-// ---------------------------------------------------------------------------
 
 /** Physical SMART disk (type: sat | nvme | scsi). */
 export type DiskInfo = {
@@ -204,10 +184,6 @@ export type DisksOutput = {
   devices: DeviceInfo[];
 };
 
-// ---------------------------------------------------------------------------
-// REQ-7: temps command output
-// ---------------------------------------------------------------------------
-
 export type TempInfo = {
   /** system name */
   system: string;
@@ -220,10 +196,6 @@ export type TempInfo = {
 export type TempsOutput = {
   systems: TempInfo[];
 };
-
-// ---------------------------------------------------------------------------
-// REQ-8: health command output
-// ---------------------------------------------------------------------------
 
 export type IssueSeverity = HealthSeverity;
 export type IssueKind = HealthKind;
@@ -241,10 +213,6 @@ export type HealthReport = {
   checked: number;
 };
 
-// ---------------------------------------------------------------------------
-// REQ-9: historical --since query envelope
-// ---------------------------------------------------------------------------
-
 /**
  * Wraps time-series output when --since is passed.
  * Commands that support --since wrap their payload in this shape.
@@ -259,10 +227,6 @@ export type HistoricalEnvelope<T> = {
   /** ordered data points */
   points: T[];
 };
-
-// ---------------------------------------------------------------------------
-// Error envelope (cross-cutting)
-// ---------------------------------------------------------------------------
 
 export type ErrorEnvelope = {
   error: {

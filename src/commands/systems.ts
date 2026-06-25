@@ -17,17 +17,12 @@ import { emit, resolveMode, type RenderCallback } from "../utils/output.js";
 import { handleError } from "../utils/errors.js";
 import type { SystemsOutput } from "../types/output.js";
 
-// ---------------------------------------------------------------------------
-// registerSystems — attach the `systems` subcommand to a Commander program
-// ---------------------------------------------------------------------------
-
 export function registerSystems(program: Command): void {
   program
     .command("systems")
     .description("List all fleet systems")
     .option("--status <value>", "Filter by system status (e.g. up, down)")
     .action(async (opts: { status?: string }, cmd: Command) => {
-      // Resolve global options from the root command.
       const globalOpts = cmd.optsWithGlobals() as {
         json?: boolean;
         noColor?: boolean;
@@ -41,7 +36,6 @@ export function registerSystems(program: Command): void {
         const client = await createClient(config, globalOpts.noCache ?? false);
         const result = await fetchSystems(client, opts.status);
 
-        // TTY renderer — loaded dynamically so Ink is never on the agent path.
         const renderer: RenderCallback<SystemsOutput> = async (data) => {
           const { renderSystemsTable } = await import("../renderers/ink/SystemsTable.js");
           await renderSystemsTable(data);

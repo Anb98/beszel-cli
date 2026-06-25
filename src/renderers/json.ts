@@ -11,10 +11,6 @@
  * extra keys appended last.
  */
 
-// ---------------------------------------------------------------------------
-// serializeJson — public API
-// ---------------------------------------------------------------------------
-
 /**
  * Serialize a value to a pretty-printed JSON string (2-space indent).
  *
@@ -28,10 +24,6 @@
 export function serializeJson(data: unknown): string {
   return JSON.stringify(data, stableReplacer(), 2) + "\n";
 }
-
-// ---------------------------------------------------------------------------
-// stableReplacer — deterministic key ordering
-// ---------------------------------------------------------------------------
 
 /**
  * Key priority list — lower index = earlier in output.
@@ -105,9 +97,7 @@ const PRIORITY_INDEX = new Map(KEY_PRIORITY.map((k, i) => [k, i]));
 const UNKNOWN_PRIORITY = KEY_PRIORITY.length; // append after known keys
 
 function stableReplacer() {
-  // The replacer is called for every value in the object graph.
-  // We return a Proxy/sorted object only for plain objects so arrays stay in order.
-  return function (_key: string, value: unknown): unknown {
+    return function (_key: string, value: unknown): unknown {
     if (value !== null && typeof value === "object" && !Array.isArray(value)) {
       const sorted: Record<string, unknown> = {};
       const keys = Object.keys(value as Record<string, unknown>).sort((a, b) => {

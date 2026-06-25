@@ -15,10 +15,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { resolveMode, emit } from "../../src/utils/output.js";
 
-// ---------------------------------------------------------------------------
-// Helpers — capture process.stdout.write calls
-// ---------------------------------------------------------------------------
-
 function captureStdout(): { chunks: string[]; restore: () => void } {
   const chunks: string[] = [];
   const original = process.stdout.write.bind(process.stdout);
@@ -33,10 +29,6 @@ function captureStdout(): { chunks: string[]; restore: () => void } {
     restore: () => spy.mockRestore(),
   };
 }
-
-// ---------------------------------------------------------------------------
-// resolveMode
-// ---------------------------------------------------------------------------
 
 describe("resolveMode", () => {
   const originalIsTTY = process.stdout.isTTY;
@@ -92,10 +84,6 @@ describe("resolveMode", () => {
     expect(resolveMode({ json: true })).toBe("json");
   });
 });
-
-// ---------------------------------------------------------------------------
-// emit — JSON mode
-// ---------------------------------------------------------------------------
 
 describe("emit — JSON mode", () => {
   let captured: ReturnType<typeof captureStdout>;
@@ -157,10 +145,6 @@ describe("emit — JSON mode", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// emit — TTY mode without renderer (fallback to JSON)
-// ---------------------------------------------------------------------------
-
 describe("emit — TTY mode without renderer", () => {
   let captured: ReturnType<typeof captureStdout>;
   const originalExitCode = process.exitCode;
@@ -203,10 +187,6 @@ describe("emit — TTY mode without renderer", () => {
     expect(process.env["NO_COLOR"]).toBe("1");
   });
 });
-
-// ---------------------------------------------------------------------------
-// emit — TTY mode with renderer
-// ---------------------------------------------------------------------------
 
 describe("emit — TTY mode with renderer", () => {
   const originalIsTTY = process.stdout.isTTY;

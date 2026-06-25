@@ -25,10 +25,6 @@ import {
   type FlagDef,
 } from "../src/command-contract/registry.js";
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 function mdTable(headers: string[], rows: string[][]): string {
   const colWidths = headers.map((h, i) =>
     Math.max(h.length, ...rows.map((r) => (r[i] ?? "").length)),
@@ -102,29 +98,21 @@ ${exampleLines}
 `;
 }
 
-// ---------------------------------------------------------------------------
-// Main renderer
-// ---------------------------------------------------------------------------
-
 function renderSkillMd(): string {
-  // --- 1. Lead: canonical command table ---
   const commandRows = COMMAND_REGISTRY.map((cmd) => [
     `\`beszel ${cmd.name}\``,
     cmd.purpose,
     cmd.outputShape,
   ]);
 
-  // --- 2. Per-command sections ---
   const commandSections = COMMAND_REGISTRY.map(renderCommandSection).join("\n---\n\n");
 
-  // --- 3. Exit-code table ---
   const exitCodeRows = EXIT_CODE_TABLE.map((e) => [
     String(e.code),
     e.condition,
     e.errorCode ?? "—",
   ]);
 
-  // --- 4. Env vars table ---
   const envRows = ENV_VARS.map((e) => [
     `\`${e.name}\``,
     e.required ? "required" : "optional",
@@ -255,10 +243,6 @@ beszel health --disk-warn 80 --disk-crit 90 --strict --json
 \`\`\`
 `;
 }
-
-// ---------------------------------------------------------------------------
-// Entry point
-// ---------------------------------------------------------------------------
 
 const dryRun = process.argv.includes("--dry-run");
 const content = renderSkillMd();

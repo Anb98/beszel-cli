@@ -29,10 +29,6 @@ import systemsFixture from "../fixtures/systems.json" with { type: "json" };
 import systemDetailsFixture from "../fixtures/system_details.json" with { type: "json" };
 import systemStatsFixture from "../fixtures/system_stats.json" with { type: "json" };
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
 const BASE_URL = "http://beszel-system-cmd.test";
 const VALID_CONFIG: BeszelConfig = {
   url: BASE_URL,
@@ -48,10 +44,6 @@ function buildJwt(exp: number): string {
   return `${h}.${p}.sig`;
 }
 const TOKEN = buildJwt(Math.floor(Date.now() / 1000) + 7 * 86400);
-
-// ---------------------------------------------------------------------------
-// MSW server
-// ---------------------------------------------------------------------------
 
 const server = setupServer(
   http.post(`${BASE_URL}${AUTH_PATH}`, () =>
@@ -77,10 +69,6 @@ async function makeClient(): Promise<BeszelClient> {
   await client.authenticate();
   return client;
 }
-
-// ---------------------------------------------------------------------------
-// Tests — REQ-4
-// ---------------------------------------------------------------------------
 
 describe("beszel system — REQ-4", () => {
   describe("happy path — case-insensitive name resolution", () => {
@@ -182,10 +170,6 @@ describe("beszel system — REQ-4", () => {
     });
   });
 });
-
-// ---------------------------------------------------------------------------
-// Tests — REQ-9 (--since on system command)
-// ---------------------------------------------------------------------------
 
 describe("beszel system --since — REQ-9", () => {
   it("returns HistoricalEnvelope with interval, from, to, points", async () => {

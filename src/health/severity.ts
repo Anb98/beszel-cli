@@ -30,10 +30,6 @@
 import type { HealthIssue, HealthReport, HealthSeverity } from "../types/output.js";
 import type { Thresholds } from "./thresholds.js";
 
-// ---------------------------------------------------------------------------
-// FleetData — input to evaluateHealth
-// ---------------------------------------------------------------------------
-
 /**
  * Minimal shape of a mapped system needed for health evaluation.
  * Accepts SystemItem from output types or a subset for testing.
@@ -68,10 +64,6 @@ export type HealthDevice = {
   syncAction?: string | null;
 };
 
-// ---------------------------------------------------------------------------
-// evaluateHealth — public API
-// ---------------------------------------------------------------------------
-
 /**
  * Evaluate fleet health and return a HealthReport.
  *
@@ -95,7 +87,6 @@ export function evaluateHealth(
     collectDeviceIssues(device, thresholds, issues);
   }
 
-  // --strict: promote all "warn" to "crit" post-aggregation.
   const finalIssues = thresholds.strict
     ? issues.map((issue) => ({ ...issue, severity: "crit" as HealthSeverity }))
     : issues;
@@ -107,10 +98,6 @@ export function evaluateHealth(
   };
 }
 
-// ---------------------------------------------------------------------------
-// healthExitCode — derive exit code from HealthReport (design R5)
-// ---------------------------------------------------------------------------
-
 /**
  * Return the process exit code for a HealthReport.
  *   - 1 when any CRITICAL issue exists
@@ -121,10 +108,6 @@ export function healthExitCode(report: HealthReport): number {
   return hasCritical ? 1 : 0;
 }
 
-// ---------------------------------------------------------------------------
-// Internal helpers
-// ---------------------------------------------------------------------------
-
 const CRITICAL_RAID_STATES = new Set(["degraded", "failed", "inactive"]);
 const WARNING_SYNC_ACTIONS = new Set(["resync", "recover", "recovery", "check", "repair", "reshape"]);
 
@@ -134,7 +117,6 @@ function collectSystemIssues(
   thresholds: Thresholds,
   issues: HealthIssue[],
 ): void {
-  // Rule 1: system down.
   if (system.status !== "up") {
     issues.push({
       system: system.name,
@@ -144,19 +126,16 @@ function collectSystemIssues(
     });
   }
 
-  // Rules 6–7: disk usage.
   if (system.diskPct !== null && system.diskPct !== undefined) {
     const diskIssue = evalDiskUsage(system.name, system.diskPct, thresholds);
     if (diskIssue) issues.push(diskIssue);
   }
 
-  // Rules 8–9: system temperature (displayTempC).
   if (system.displayTempC !== null && system.displayTempC !== undefined) {
     const tempIssue = evalTemp(system.name, "displayTempC", system.displayTempC, thresholds);
     if (tempIssue) issues.push(tempIssue);
   }
 
-  // Rules 8–9: sensor temperatures (from system_stats.stats.t).
   if (system.sensors) {
     for (const [sensor, celsius] of Object.entries(system.sensors)) {
       const tempIssue = evalTemp(system.name, sensor, celsius, thresholds);
@@ -172,7 +151,6 @@ function collectDeviceIssues(
   issues: HealthIssue[],
 ): void {
   if (device.kind === "disk") {
-    // Rule 2: SMART disk state.
     if (device.state !== "PASSED") {
       issues.push({
         system: device.system,
@@ -181,13 +159,11 @@ function collectDeviceIssues(
         detail: `SMART state is "${device.state ?? "unknown"}" (expected "PASSED").`,
       });
     }
-    // Rules 10–11: disk temp.
     if (device.tempC !== null && device.tempC !== undefined) {
       const tempIssue = evalDiskTemp(device.system, device.tempC, thresholds);
       if (tempIssue) issues.push(tempIssue);
     }
   } else {
-    // kind === "raid" — Rules 3–5 (top-down first-match).
     const raidIssue = evalRaid(device, thresholds);
     if (raidIssue) issues.push(raidIssue);
   }
@@ -224,7 +200,6 @@ function evalDiskUsage(
  * Evaluate a RAID device (top-down first-match per design R1).
  */
 function evalRaid(device: HealthDevice, _thresholds: Thresholds): HealthIssue | null {
-  // Rule 3: SMART state not PASSED OR arrayState in {degraded, failed, inactive} → CRITICAL.
   if (
     device.state !== "PASSED" ||
     (device.arrayState !== null &&
@@ -239,7 +214,6 @@ function evalRaid(device: HealthDevice, _thresholds: Thresholds): HealthIssue | 
     };
   }
 
-  // Rule 4: syncAction not idle → WARNING.
   if (
     device.syncAction !== null &&
     device.syncAction !== undefined &&
@@ -254,7 +228,6 @@ function evalRaid(device: HealthDevice, _thresholds: Thresholds): HealthIssue | 
     };
   }
 
-  // Rule 5: clean + idle → OK.
   return null;
 }
 
