@@ -26,14 +26,14 @@ import { CliError } from "../types/errors.js";
 // ContainersOptions — mirrors the CLI flags
 // ---------------------------------------------------------------------------
 
-export interface ContainersOptions {
+export type ContainersOptions = {
   /** Limit results to top N items (server-side perPage). */
   top?: number;
   /** Sort field: "cpu" → server sort `-cpu`, "memory" → server sort `-memory`. */
   sort?: "cpu" | "memory";
   /** Filter to containers on a named system (name or id). */
   system?: string;
-}
+};
 
 // ---------------------------------------------------------------------------
 // resolveSystemId — name → id lookup for --system filter

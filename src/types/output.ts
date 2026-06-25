@@ -10,17 +10,60 @@
  */
 
 // ---------------------------------------------------------------------------
+// Shared domain unions
+// ---------------------------------------------------------------------------
+
+/** System lifecycle state reported by the Beszel agent. */
+export type SystemStatus = "up" | "down" | "paused" | "pending";
+
+/** Discriminant for the DiskInfo / RaidInfo union. */
+export type DeviceKind = "disk" | "raid";
+
+/** Health issue severity level. */
+export type HealthSeverity = "crit" | "warn";
+
+/** Health issue category. */
+export type HealthKind = "down" | "smart" | "raid" | "disk" | "temp";
+
+/** Stat retention bucket intervals. */
+export type StatsInterval = "1m" | "10m" | "20m" | "120m" | "480m";
+
+/**
+ * SMART overall state string from Beszel.
+ * Known values + open union so new values from future agent releases pass through
+ * without breaking the schema (REQ-10).
+ */
+export type SmartState = "PASSED" | "FAILED" | "UNKNOWN" | (string & {});
+
+/**
+ * Physical disk protocol type from Beszel smart_devices.type.
+ * Open union — Beszel may add new types across versions (REQ-10).
+ */
+export type DiskType = "sat" | "nvme" | "scsi" | "emmc" | "mdraid" | (string & {});
+
+/**
+ * md-RAID array state string from ArrayState attribute.
+ * Open union — Beszel may add new states across versions (REQ-10).
+ */
+export type RaidArrayState = "clean" | "degraded" | "failed" | "inactive" | "write-pending" | (string & {});
+
+/**
+ * md-RAID sync action string from SyncAction attribute.
+ * Open union — Beszel may add new actions across versions (REQ-10).
+ */
+export type RaidSyncAction = "idle" | "resync" | "recover" | "recovery" | "check" | "repair" | "reshape" | (string & {});
+
+// ---------------------------------------------------------------------------
 // REQ-3: systems command output
 // ---------------------------------------------------------------------------
 
 /** One system in the fleet listing. */
-export interface SystemItem {
+export type SystemItem = {
   // --- stable-mandatory ---
   id: string;
   name: string;
   host: string | null;
-  /** up | down | paused | pending */
-  status: string;
+  status: SystemStatus;
   /** cpu% — null when upstream info is absent */
   cpu: number | null;
   /** mem% — null when upstream mp is absent */
@@ -40,23 +83,23 @@ export interface SystemItem {
   loadAvg?: number[];
   /** extra/RAID fs usage% map from systems.info.efs */
   extraFs?: Record<string, number>;
-}
+};
 
-export interface SystemsOutput {
+export type SystemsOutput = {
   systems: SystemItem[];
-}
+};
 
 // ---------------------------------------------------------------------------
 // REQ-4: system <name> command output
 // ---------------------------------------------------------------------------
 
 /** Detailed system info (merged snapshot + system_details). */
-export interface SystemDetail {
+export type SystemDetail = {
   // from systems record
   id: string;
   name: string;
   host: string | null;
-  status: string;
+  status: SystemStatus;
   cpu: number | null;
   memPct: number | null;
   diskPct: number | null;
@@ -67,10 +110,10 @@ export interface SystemDetail {
   containerCount?: number;
   loadAvg?: number[];
   extraFs?: Record<string, number>;
-}
+};
 
 /** Hardware/OS detail from system_details collection. */
-export interface SystemDetailsInfo {
+export type SystemDetailsInfo = {
   hostname: string | null;
   /** OS name string, e.g. "Alpine Linux" */
   os: string | null;
@@ -84,19 +127,19 @@ export interface SystemDetailsInfo {
   memoryBytes: number | null;
   /** true when container runtime is Podman */
   podman?: boolean;
-}
+};
 
-export interface SystemOutput {
+export type SystemOutput = {
   system: SystemDetail;
   /** null when system_details record is absent for this host */
   details: SystemDetailsInfo | null;
-}
+};
 
 // ---------------------------------------------------------------------------
 // REQ-5: containers command output
 // ---------------------------------------------------------------------------
 
-export interface ContainerInfo {
+export type ContainerInfo = {
   // --- stable ---
   name: string;
   /** parent system name */
@@ -104,8 +147,7 @@ export interface ContainerInfo {
   status: string | null;
   /**
    * Health status code — NUMBER (e.g. 0).
-   * Bug fix: was incorrectly typed as string; Beszel returns a numeric health
-   * code. See upstream.ts ContainerRecordSchema fix (2026-06-24).
+   * Beszel returns a numeric health code, not a string.
    */
   health: number | null;
   /** cpu% */
@@ -115,94 +157,89 @@ export interface ContainerInfo {
   image: string | null;
   // --- optional ---
   ports?: string;
-}
+};
 
-export interface ContainersOutput {
+export type ContainersOutput = {
   containers: ContainerInfo[];
-}
+};
 
 // ---------------------------------------------------------------------------
 // REQ-6: disks command output
 // ---------------------------------------------------------------------------
 
 /** Physical SMART disk (type: sat | nvme | scsi). */
-export interface DiskInfo {
+export type DiskInfo = {
   kind: "disk";
   name: string;
   system: string;
-  /** PASSED | FAILED */
-  state: string | null;
+  state: SmartState | null;
   model: string | null;
   /** temperature °C */
   tempC: number | null;
   capacityBytes: number | null;
-  /** sat | nvme | scsi */
-  type: string | null;
+  type: DiskType | null;
   // optional
   serial?: string;
   firmware?: string;
   hours?: number;
   cycles?: number;
-}
+};
 
 /** md-RAID array (type: mdraid). */
-export interface RaidInfo {
+export type RaidInfo = {
   kind: "raid";
   name: string;
   system: string;
-  /** PASSED | FAILED (overall SMART state) */
-  state: string | null;
+  state: SmartState | null;
   /** e.g. raid5 */
   raidLevel: string | null;
-  /** clean | degraded | inactive | failed */
-  arrayState: string | null;
+  arrayState: RaidArrayState | null;
   raidDisks: number | null;
-  /** idle | resync | recover | check | repair | reshape */
-  syncAction: string | null;
-}
+  syncAction: RaidSyncAction | null;
+};
 
 export type DeviceInfo = DiskInfo | RaidInfo;
 
-export interface DisksOutput {
+export type DisksOutput = {
   devices: DeviceInfo[];
-}
+};
 
 // ---------------------------------------------------------------------------
 // REQ-7: temps command output
 // ---------------------------------------------------------------------------
 
-export interface TempInfo {
+export type TempInfo = {
   /** system name */
   system: string;
   /** from systems.info.dt */
   displayTempC: number | null;
   /** from system_stats.stats.t (1m bucket); merged with disk temps when --disks */
   sensors: Record<string, number>;
-}
+};
 
-export interface TempsOutput {
+export type TempsOutput = {
   systems: TempInfo[];
-}
+};
 
 // ---------------------------------------------------------------------------
 // REQ-8: health command output
 // ---------------------------------------------------------------------------
 
-export type IssueSeverity = "crit" | "warn";
-export type IssueKind = "down" | "smart" | "raid" | "disk" | "temp";
+export type IssueSeverity = HealthSeverity;
+export type IssueKind = HealthKind;
 
-export interface HealthIssue {
+export type HealthIssue = {
   system: string;
   severity: IssueSeverity;
   kind: IssueKind;
   detail: string;
-}
+};
 
-export interface HealthReport {
+export type HealthReport = {
   healthy: boolean;
   issues: HealthIssue[];
   checked: number;
-}
+};
 
 // ---------------------------------------------------------------------------
 // REQ-9: historical --since query envelope
@@ -212,25 +249,25 @@ export interface HealthReport {
  * Wraps time-series output when --since is passed.
  * Commands that support --since wrap their payload in this shape.
  */
-export interface HistoricalEnvelope<T> {
+export type HistoricalEnvelope<T> = {
   /** selected interval bucket: 1m | 10m | 20m | 120m | 480m */
-  interval: string;
+  interval: StatsInterval;
   /** ISO 8601 start of window */
   from: string;
   /** ISO 8601 end of window (now) */
   to: string;
   /** ordered data points */
   points: T[];
-}
+};
 
 // ---------------------------------------------------------------------------
 // Error envelope (cross-cutting)
 // ---------------------------------------------------------------------------
 
-export interface ErrorEnvelope {
+export type ErrorEnvelope = {
   error: {
     code: string;
     message: string;
     hint: string;
   };
-}
+};

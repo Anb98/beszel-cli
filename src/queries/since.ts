@@ -24,11 +24,11 @@ import { CliError } from "../types/errors.js";
 
 export type IntervalBucket = "1m" | "10m" | "20m" | "120m" | "480m";
 
-interface Bucket {
+type Bucket = {
   interval: IntervalBucket;
   /** Maximum window (in ms) this bucket covers. */
   maxWindowMs: number;
-}
+};
 
 const BUCKETS: readonly Bucket[] = [
   { interval: "1m",   maxWindowMs: 1.5 * 60 * 60 * 1000 },   // 1.5 hours
@@ -141,22 +141,20 @@ export function toPocketBaseDateTime(iso: string): string {
   return iso.replace("T", " ");
 }
 
-export interface SinceResult {
+export type SinceResult = {
   /** Selected interval bucket, e.g. "10m" */
   interval: IntervalBucket;
   /**
    * ISO 8601 start of window (now - window).
-   * Use this for human/agent-facing output envelopes (from/to fields).
    * For PocketBase filter strings, use toPocketBaseDateTime(from).
    */
   from: string;
   /**
    * ISO 8601 end of window (now).
-   * Use this for human/agent-facing output envelopes (from/to fields).
    * For PocketBase filter strings, use toPocketBaseDateTime(to).
    */
   to: string;
-}
+};
 
 // ---------------------------------------------------------------------------
 // resolveSince — parse duration string → select bucket → build SinceResult

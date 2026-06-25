@@ -41,7 +41,7 @@ const DEFAULTS = {
 // ThresholdFlags — flag values supplied by Commander (may be undefined)
 // ---------------------------------------------------------------------------
 
-export interface ThresholdFlags {
+export type ThresholdFlags = {
   diskWarn?: number;
   diskCrit?: number;
   tempWarn?: number;
@@ -49,13 +49,13 @@ export interface ThresholdFlags {
   diskTempWarn?: number;
   diskTempCrit?: number;
   strict?: boolean;
-}
+};
 
 // ---------------------------------------------------------------------------
 // Thresholds — fully-resolved threshold configuration
 // ---------------------------------------------------------------------------
 
-export interface Thresholds {
+export type Thresholds = {
   diskWarn: number;
   diskCrit: number;
   tempWarn: number;
@@ -64,7 +64,7 @@ export interface Thresholds {
   diskTempCrit: number;
   /** When true, severity.ts promotes all "warn" issues to "crit". */
   strict: boolean;
-}
+};
 
 // ---------------------------------------------------------------------------
 // resolveThresholds — public API

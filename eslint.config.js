@@ -6,6 +6,9 @@ import importPlugin from "eslint-plugin-import";
  * Core boundary modules that must remain Ink-free.
  * These directories contain pure data logic and must never import
  * from Ink or React (the presentation layer).
+ *
+ * W1: src/utils added — error handler and output router are core utilities
+ * that must not pull in Ink/React, keeping the agent path clean (REQ-2).
  */
 const INK_FREE_CORE_DIRS = [
   "src/client",
@@ -13,6 +16,7 @@ const INK_FREE_CORE_DIRS = [
   "src/types",
   "src/mapping",
   "src/health",
+  "src/utils",
 ];
 
 const restrictedZones = INK_FREE_CORE_DIRS.map((dir) => ({

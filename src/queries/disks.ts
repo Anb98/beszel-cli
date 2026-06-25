@@ -29,12 +29,12 @@ import { CliError } from "../types/errors.js";
 // DisksOptions
 // ---------------------------------------------------------------------------
 
-export interface DisksOptions {
+export type DisksOptions = {
   /** Filter to one system by name or id. When absent, queries the entire fleet. */
   system?: string;
   /** Filter to failing devices only (disk: state!="PASSED"; raid: not clean+idle). */
   failing?: boolean;
-}
+};
 
 // ---------------------------------------------------------------------------
 // isFailing — determine whether a mapped DeviceInfo is failing
@@ -118,7 +118,6 @@ export async function fetchDisks(
 ): Promise<DisksOutput> {
   const ListSchema = PocketBaseListSchema(SmartDeviceRecordSchema);
 
-  // Build filter and system name map for mapSmartDevice().
   let filterParts: string[] = [];
   let systemNameMap: Map<string, string> = new Map();
 
@@ -127,7 +126,6 @@ export async function fetchDisks(
     filterParts.push(`system="${id}"`);
     systemNameMap.set(id, name);
   } else {
-    // Fleet mode: fetch system names for labelling.
     const SysListSchema = PocketBaseListSchema(SystemRecordSchema);
     const sysRaw = await client.listRecords("systems", {
       sort: "name",
@@ -159,7 +157,6 @@ export async function fetchDisks(
     return mapSmartDevice(record, systemName);
   });
 
-  // Apply --failing filter client-side.
   if (opts.failing) {
     devices = devices.filter(isFailing);
   }

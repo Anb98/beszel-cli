@@ -41,10 +41,10 @@ function fmtTemp(v: number | null): string {
 // Per-system temp block
 // ---------------------------------------------------------------------------
 
-interface TempBlockProps {
+type TempBlockProps = {
   info: TempInfo;
   colorEnabled: boolean;
-}
+};
 
 function TempBlock({ info, colorEnabled }: TempBlockProps): React.ReactElement {
   const sensorEntries = Object.entries(info.sensors).sort(([a], [b]) =>
@@ -97,9 +97,9 @@ function TempBlock({ info, colorEnabled }: TempBlockProps): React.ReactElement {
 // TempsList root component
 // ---------------------------------------------------------------------------
 
-interface TempsListProps {
+type TempsListProps = {
   data: TempsOutput;
-}
+};
 
 export function TempsList({ data }: TempsListProps): React.ReactElement {
   const colorEnabled = useColor();

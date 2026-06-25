@@ -28,10 +28,10 @@ import type { SmartDeviceRecord, SystemStatsRecord } from "../types/upstream.js"
 // TempsOptions
 // ---------------------------------------------------------------------------
 
-export interface TempsOptions {
+export type TempsOptions = {
   /** When true, merge smart_devices.temp into the sensors map. */
   disks?: boolean;
-}
+};
 
 // ---------------------------------------------------------------------------
 // fetchTemps — public API

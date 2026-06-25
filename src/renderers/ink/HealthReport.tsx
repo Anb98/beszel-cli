@@ -52,10 +52,10 @@ function kindLabel(kind: string): string {
 // Issue row
 // ---------------------------------------------------------------------------
 
-interface IssueRowProps {
+type IssueRowProps = {
   issue: HealthIssue;
   colorEnabled: boolean;
-}
+};
 
 function IssueRow({ issue, colorEnabled }: IssueRowProps): React.ReactElement {
   const color = severityColor(issue.severity, colorEnabled);
@@ -73,9 +73,9 @@ function IssueRow({ issue, colorEnabled }: IssueRowProps): React.ReactElement {
 // HealthReport root component
 // ---------------------------------------------------------------------------
 
-interface HealthReportComponentProps {
+type HealthReportComponentProps = {
   data: HealthReportData;
-}
+};
 
 export function HealthReportComponent({ data }: HealthReportComponentProps): React.ReactElement {
   const colorEnabled = useColor();

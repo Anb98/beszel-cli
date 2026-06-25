@@ -100,10 +100,10 @@ function Header(): React.ReactElement {
 // Container row
 // ---------------------------------------------------------------------------
 
-interface ContainerRowProps {
+type ContainerRowProps = {
   item: ContainerInfo;
   colorEnabled: boolean;
-}
+};
 
 function ContainerRow({ item, colorEnabled }: ContainerRowProps): React.ReactElement {
   const sColor = colorEnabled ? statusColor(item.status) : undefined;
@@ -140,9 +140,9 @@ function groupBySystem(containers: ContainerInfo[]): Map<string, ContainerInfo[]
 // ContainersList root component
 // ---------------------------------------------------------------------------
 
-interface ContainersListProps {
+type ContainersListProps = {
   data: ContainersOutput;
-}
+};
 
 export function ContainersList({ data }: ContainersListProps): React.ReactElement {
   const colorEnabled = useColor();

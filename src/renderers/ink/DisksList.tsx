@@ -65,10 +65,10 @@ function truncate(s: string | null | undefined, width: number): string {
 // Disk row (SMART physical drive)
 // ---------------------------------------------------------------------------
 
-interface DiskRowProps {
+type DiskRowProps = {
   item: DiskInfo;
   colorEnabled: boolean;
-}
+};
 
 function DiskRow({ item, colorEnabled }: DiskRowProps): React.ReactElement {
   const sColor = stateColor(item.state, colorEnabled);
@@ -124,10 +124,10 @@ function DiskRow({ item, colorEnabled }: DiskRowProps): React.ReactElement {
 // RAID row
 // ---------------------------------------------------------------------------
 
-interface RaidRowProps {
+type RaidRowProps = {
   item: RaidInfo;
   colorEnabled: boolean;
-}
+};
 
 function RaidRow({ item, colorEnabled }: RaidRowProps): React.ReactElement {
   const asColor = arrayStateColor(item.arrayState, colorEnabled);
@@ -181,9 +181,9 @@ function groupBySystem(devices: DeviceInfo[]): Map<string, DeviceInfo[]> {
 // DisksList root component
 // ---------------------------------------------------------------------------
 
-interface DisksListProps {
+type DisksListProps = {
   data: DisksOutput;
-}
+};
 
 export function DisksList({ data }: DisksListProps): React.ReactElement {
   const colorEnabled = useColor();

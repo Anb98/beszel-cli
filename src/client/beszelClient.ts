@@ -63,7 +63,7 @@ export function checkVersion(observedVersion: string | undefined): void {
 // PocketBase list query options
 // ---------------------------------------------------------------------------
 
-export interface ListOptions {
+export type ListOptions = {
   filter?: string;
   sort?: string;
   fields?: string;
@@ -71,19 +71,19 @@ export interface ListOptions {
   page?: number;
   /** When true, PocketBase skips the COUNT query (faster for large collections). */
   skipTotal?: boolean;
-}
+};
 
 // ---------------------------------------------------------------------------
 // PocketBase auth response shape (minimal — only what we need)
 // ---------------------------------------------------------------------------
 
-interface AuthResponse {
+type AuthResponse = {
   token: string;
   record?: {
     id?: string;
     email?: string;
   };
-}
+};
 
 // ---------------------------------------------------------------------------
 // BeszelClient

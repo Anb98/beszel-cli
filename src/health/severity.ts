@@ -27,7 +27,7 @@
  * Input: plain data objects (already mapped from key-map). No BeszelClient calls.
  */
 
-import type { HealthIssue, HealthReport, IssueSeverity } from "../types/output.js";
+import type { HealthIssue, HealthReport, HealthSeverity } from "../types/output.js";
 import type { Thresholds } from "./thresholds.js";
 
 // ---------------------------------------------------------------------------
@@ -38,7 +38,7 @@ import type { Thresholds } from "./thresholds.js";
  * Minimal shape of a mapped system needed for health evaluation.
  * Accepts SystemItem from output types or a subset for testing.
  */
-export interface HealthSystem {
+export type HealthSystem = {
   name: string;
   status: string;
   diskPct: number | null;
@@ -46,13 +46,13 @@ export interface HealthSystem {
   displayTempC?: number | null;
   /** sensor map from system_stats.stats.t (1m bucket) */
   sensors?: Record<string, number>;
-}
+};
 
 /**
  * Minimal shape of a mapped DeviceInfo needed for health evaluation.
  * Accepts DiskInfo or RaidInfo from output types.
  */
-export interface HealthDevice {
+export type HealthDevice = {
   /** system name */
   system: string;
   kind: "disk" | "raid";
@@ -66,7 +66,7 @@ export interface HealthDevice {
   arrayState?: string | null;
   /** idle | resync | recover | recovery | check | repair | reshape */
   syncAction?: string | null;
-}
+};
 
 // ---------------------------------------------------------------------------
 // evaluateHealth — public API
@@ -88,77 +88,16 @@ export function evaluateHealth(
   const issues: HealthIssue[] = [];
 
   for (const system of systems) {
-    // Rule 1: system down.
-    if (system.status !== "up") {
-      issues.push({
-        system: system.name,
-        severity: "crit",
-        kind: "down",
-        detail: `System is ${system.status} (expected "up").`,
-      });
-    }
-
-    // Rules 6–7: disk usage.
-    if (system.diskPct !== null && system.diskPct !== undefined) {
-      if (system.diskPct > thresholds.diskCrit) {
-        issues.push({
-          system: system.name,
-          severity: "crit",
-          kind: "disk",
-          detail: `Disk usage ${system.diskPct.toFixed(1)}% exceeds critical threshold ${thresholds.diskCrit}%.`,
-        });
-      } else if (system.diskPct > thresholds.diskWarn) {
-        issues.push({
-          system: system.name,
-          severity: "warn",
-          kind: "disk",
-          detail: `Disk usage ${system.diskPct.toFixed(1)}% exceeds warning threshold ${thresholds.diskWarn}%.`,
-        });
-      }
-    }
-
-    // Rules 8–9: system temperature (displayTempC).
-    if (system.displayTempC !== null && system.displayTempC !== undefined) {
-      const tempIssue = evalTemp(system.name, "displayTempC", system.displayTempC, thresholds);
-      if (tempIssue) issues.push(tempIssue);
-    }
-
-    // Rules 8–9: sensor temperatures (from system_stats.stats.t).
-    if (system.sensors) {
-      for (const [sensor, celsius] of Object.entries(system.sensors)) {
-        const tempIssue = evalTemp(system.name, sensor, celsius, thresholds);
-        if (tempIssue) issues.push(tempIssue);
-      }
-    }
+    collectSystemIssues(system, thresholds, issues);
   }
 
-  // Rules 2–5, 10–11: device checks.
   for (const device of devices) {
-    if (device.kind === "disk") {
-      // Rule 2: SMART disk state.
-      if (device.state !== "PASSED") {
-        issues.push({
-          system: device.system,
-          severity: "crit",
-          kind: "smart",
-          detail: `SMART state is "${device.state ?? "unknown"}" (expected "PASSED").`,
-        });
-      }
-      // Rules 10–11: disk temp.
-      if (device.tempC !== null && device.tempC !== undefined) {
-        const tempIssue = evalDiskTemp(device.system, device.tempC, thresholds);
-        if (tempIssue) issues.push(tempIssue);
-      }
-    } else {
-      // kind === "raid" — Rules 3–5 (top-down first-match).
-      const raidIssue = evalRaid(device, thresholds);
-      if (raidIssue) issues.push(raidIssue);
-    }
+    collectDeviceIssues(device, thresholds, issues);
   }
 
   // --strict: promote all "warn" to "crit" post-aggregation.
   const finalIssues = thresholds.strict
-    ? issues.map((issue) => ({ ...issue, severity: "crit" as IssueSeverity }))
+    ? issues.map((issue) => ({ ...issue, severity: "crit" as HealthSeverity }))
     : issues;
 
   return {
@@ -188,6 +127,98 @@ export function healthExitCode(report: HealthReport): number {
 
 const CRITICAL_RAID_STATES = new Set(["degraded", "failed", "inactive"]);
 const WARNING_SYNC_ACTIONS = new Set(["resync", "recover", "recovery", "check", "repair", "reshape"]);
+
+/** Collect all health issues for a single system (rules 1, 6–9). */
+function collectSystemIssues(
+  system: HealthSystem,
+  thresholds: Thresholds,
+  issues: HealthIssue[],
+): void {
+  // Rule 1: system down.
+  if (system.status !== "up") {
+    issues.push({
+      system: system.name,
+      severity: "crit",
+      kind: "down",
+      detail: `System is ${system.status} (expected "up").`,
+    });
+  }
+
+  // Rules 6–7: disk usage.
+  if (system.diskPct !== null && system.diskPct !== undefined) {
+    const diskIssue = evalDiskUsage(system.name, system.diskPct, thresholds);
+    if (diskIssue) issues.push(diskIssue);
+  }
+
+  // Rules 8–9: system temperature (displayTempC).
+  if (system.displayTempC !== null && system.displayTempC !== undefined) {
+    const tempIssue = evalTemp(system.name, "displayTempC", system.displayTempC, thresholds);
+    if (tempIssue) issues.push(tempIssue);
+  }
+
+  // Rules 8–9: sensor temperatures (from system_stats.stats.t).
+  if (system.sensors) {
+    for (const [sensor, celsius] of Object.entries(system.sensors)) {
+      const tempIssue = evalTemp(system.name, sensor, celsius, thresholds);
+      if (tempIssue) issues.push(tempIssue);
+    }
+  }
+}
+
+/** Collect all health issues for a single device (rules 2–5, 10–11). */
+function collectDeviceIssues(
+  device: HealthDevice,
+  thresholds: Thresholds,
+  issues: HealthIssue[],
+): void {
+  if (device.kind === "disk") {
+    // Rule 2: SMART disk state.
+    if (device.state !== "PASSED") {
+      issues.push({
+        system: device.system,
+        severity: "crit",
+        kind: "smart",
+        detail: `SMART state is "${device.state ?? "unknown"}" (expected "PASSED").`,
+      });
+    }
+    // Rules 10–11: disk temp.
+    if (device.tempC !== null && device.tempC !== undefined) {
+      const tempIssue = evalDiskTemp(device.system, device.tempC, thresholds);
+      if (tempIssue) issues.push(tempIssue);
+    }
+  } else {
+    // kind === "raid" — Rules 3–5 (top-down first-match).
+    const raidIssue = evalRaid(device, thresholds);
+    if (raidIssue) issues.push(raidIssue);
+  }
+}
+
+/**
+ * Evaluate disk usage percentage against diskWarn / diskCrit thresholds.
+ */
+function evalDiskUsage(
+  systemName: string,
+  diskPct: number,
+  thresholds: Thresholds,
+): HealthIssue | null {
+  if (diskPct > thresholds.diskCrit) {
+    return {
+      system: systemName,
+      severity: "crit",
+      kind: "disk",
+      detail: `Disk usage ${diskPct.toFixed(1)}% exceeds critical threshold ${thresholds.diskCrit}%.`,
+    };
+  }
+  if (diskPct > thresholds.diskWarn) {
+    return {
+      system: systemName,
+      severity: "warn",
+      kind: "disk",
+      detail: `Disk usage ${diskPct.toFixed(1)}% exceeds warning threshold ${thresholds.diskWarn}%.`,
+    };
+  }
+  return null;
+}
 
 /**
  * Evaluate a RAID device (top-down first-match per design R1).

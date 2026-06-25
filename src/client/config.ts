@@ -37,12 +37,12 @@ const ConfigSchema = z.looseObject({
 // Exported config shape
 // ---------------------------------------------------------------------------
 
-export interface BeszelConfig {
+export type BeszelConfig = {
   url: string;
   email: string;
   password: string;
   authCollection: string;
-}
+};
 
 // ---------------------------------------------------------------------------
 // loadConfig — parse process.env; throws CliError on any validation failure

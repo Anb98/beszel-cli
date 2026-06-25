@@ -222,6 +222,26 @@ describe("S5 — RAID syncing", () => {
     expect(issue?.severity).toBe("warn");
   });
 
+  it("syncAction='repair' → WARNING kind:'raid'", () => {
+    const systems = [healthySystem()];
+    const devices = [cleanRaid({ arrayState: "clean", syncAction: "repair" })];
+    const report = evaluateHealth(systems, devices, DEFAULT_THRESHOLDS);
+    const issue = report.issues.find((i) => i.kind === "raid");
+    expect(issue).toBeDefined();
+    expect(issue!.severity).toBe("warn");
+    expect(healthExitCode(report)).toBe(0);
+  });
+
+  it("syncAction='reshape' → WARNING kind:'raid'", () => {
+    const systems = [healthySystem()];
+    const devices = [cleanRaid({ arrayState: "clean", syncAction: "reshape" })];
+    const report = evaluateHealth(systems, devices, DEFAULT_THRESHOLDS);
+    const issue = report.issues.find((i) => i.kind === "raid");
+    expect(issue).toBeDefined();
+    expect(issue!.severity).toBe("warn");
+    expect(healthExitCode(report)).toBe(0);
+  });
+
   it("arrayState='clean', syncAction='idle' → no raid issue (OK)", () => {
     const systems = [healthySystem()];
     const devices = [cleanRaid({ arrayState: "clean", syncAction: "idle" })];

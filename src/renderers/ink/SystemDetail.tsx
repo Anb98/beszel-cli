@@ -73,11 +73,11 @@ function fmtUptime(s: number | null): string {
 // Field row — label: value
 // ---------------------------------------------------------------------------
 
-interface FieldProps {
+type FieldProps = {
   label: string;
   value: string;
   valueColor?: string;
-}
+};
 
 function Field({ label, value, valueColor }: FieldProps): React.ReactElement {
   const padded = label.padEnd(18);
@@ -93,9 +93,9 @@ function Field({ label, value, valueColor }: FieldProps): React.ReactElement {
 // SystemDetailComponent
 // ---------------------------------------------------------------------------
 
-interface SystemDetailComponentProps {
+type SystemDetailComponentProps = {
   data: SystemDetailInput;
-}
+};
 
 function SystemDetailComponent({ data }: SystemDetailComponentProps): React.ReactElement {
   const colorEnabled = useColor();

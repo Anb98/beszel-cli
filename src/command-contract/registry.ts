@@ -17,22 +17,22 @@
 
 export type FieldStability = "stable" | "optional";
 
-export interface FieldDef {
+export type FieldDef = {
   name: string;
   type: string;
   stability: FieldStability;
   description: string;
-}
+};
 
-export interface FlagDef {
+export type FlagDef = {
   flag: string;
   argLabel?: string;
   env?: string;
   defaultValue?: string;
   description: string;
-}
+};
 
-export interface CommandContract {
+export type CommandContract = {
   name: string;
   usage: string;
   purpose: string;
@@ -43,7 +43,7 @@ export interface CommandContract {
   flags: FlagDef[];
   /** Example invocations. key = label, value = CLI string. */
   examples: Record<string, string>;
-}
+};
 
 // ---------------------------------------------------------------------------
 // Global flags — inherited by every subcommand via Commander .optsWithGlobals()
@@ -69,11 +69,11 @@ export const GLOBAL_FLAGS: FlagDef[] = [
 // Exit codes (design R5)
 // ---------------------------------------------------------------------------
 
-export interface ExitCodeDef {
+export type ExitCodeDef = {
   code: number;
   condition: string;
   errorCode?: string;
-}
+};
 
 export const EXIT_CODE_TABLE: ExitCodeDef[] = [
   { code: 0, condition: "Success — healthy fleet or warning-only (no --strict)" },

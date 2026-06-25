@@ -82,13 +82,13 @@ export class CliError extends Error {
 // Error envelope — the stdout shape for non-zero exits (spec cross-cutting)
 // ---------------------------------------------------------------------------
 
-export interface ErrorEnvelope {
+export type ErrorEnvelope = {
   error: {
     code: string;
     message: string;
     hint: string;
   };
-}
+};
 
 /**
  * Build the error envelope JSON string ready for process.stdout.write().

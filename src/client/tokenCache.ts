@@ -42,7 +42,7 @@ const CACHE_DIR_NAME = "beszel-cli";
  * `exp` is the JWT numeric exp claim (Unix seconds), decoded from the token
  * payload without signature verification.
  */
-export interface CachedToken {
+export type CachedToken = {
   token: string;
   /** JWT exp in Unix seconds */
   exp: number;
@@ -52,7 +52,7 @@ export interface CachedToken {
   collection: string;
   /** E-mail / identity used to authenticate */
   email: string;
-}
+};
 
 // ---------------------------------------------------------------------------
 // Path helpers

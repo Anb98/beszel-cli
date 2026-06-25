@@ -33,12 +33,12 @@ import type {
 // Internal helper — extract RAID attributes from the attributes array
 // ---------------------------------------------------------------------------
 
-interface RaidAttributes {
+type RaidAttributes = {
   arrayState: string | null;
   raidLevel: string | null;
   raidDisks: number | null;
   syncAction: string | null;
-}
+};
 
 /**
  * Parse the `attributes` array of a smart_device mdraid record into named
@@ -116,7 +116,7 @@ export function mapSystem(record: SystemRecord): SystemItem {
     id: record.id,
     name: record.name,
     host: record.host ?? null,
-    status: record.status,
+    status: record.status as import("../types/output.js").SystemStatus,
     // stable-mandatory: null when absent
     cpu: info.cpu ?? null,        // info.cpu → cpu% (provenance: live recon #472)
     memPct: info.mp ?? null,      // info.mp  → memPct (undocumented; live recon #472)
@@ -229,7 +229,7 @@ export function mapContainer(
  *   stats.la  → loadAvg [1m, 5m, 15m]
  *   stats.s   → swap
  */
-export interface MappedSystemStats {
+export type MappedSystemStats = {
   cpu: number | null;
   memTotalGB: number | null;
   memUsedGB: number | null;
@@ -244,7 +244,7 @@ export interface MappedSystemStats {
   net: number[] | null;
   loadAvg: number[] | null;
   swap: number | null;
-}
+};
 
 export function mapSystemStats(record: SystemStatsRecord): MappedSystemStats {
   const s = record.stats ?? {};
@@ -279,12 +279,12 @@ export function mapSystemStats(record: SystemStatsRecord): MappedSystemStats {
  *   m → memMB
  *   b → net [rx, tx]
  */
-export interface ContainerStatsOutput {
+export type ContainerStatsOutput = {
   name: string | null;
   cpuPct: number | null;
   memMB: number | null;
   net: number[] | null;
-}
+};
 
 export function mapContainerStatsItem(
   item: ContainerStatsItem

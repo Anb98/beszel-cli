@@ -83,10 +83,10 @@ function pad(s: string, width: number): string {
 // Row component
 // ---------------------------------------------------------------------------
 
-interface RowProps {
+type RowProps = {
   item: SystemItem;
   useColorOutput: boolean;
-}
+};
 
 function Row({ item, useColorOutput }: RowProps): React.ReactElement {
   const color = useColorOutput ? statusColor(item.status) : undefined;
@@ -145,9 +145,9 @@ function Divider(): React.ReactElement {
 // SystemsTable root component
 // ---------------------------------------------------------------------------
 
-interface SystemsTableProps {
+type SystemsTableProps = {
   data: SystemsOutput;
-}
+};
 
 export function SystemsTable({ data }: SystemsTableProps): React.ReactElement {
   const colorEnabled = useColor();

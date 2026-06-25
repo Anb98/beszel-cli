@@ -33,7 +33,7 @@ import { resolveSince, toPocketBaseDateTime, type SinceResult } from "./since.js
 // StatsOptions
 // ---------------------------------------------------------------------------
 
-export interface StatsOptions {
+export type StatsOptions = {
   /**
    * Raw --since flag value (e.g. "12h"). Required for historical queries.
    * Passed through resolveSince() → interval + from + to.
@@ -53,20 +53,20 @@ export interface StatsOptions {
    * Optional override for "now" — used in tests for deterministic timestamps.
    */
   now?: Date;
-}
+};
 
 // ---------------------------------------------------------------------------
 // StatsPoint — one time-series data point
 // ---------------------------------------------------------------------------
 
-export interface StatsPoint {
+export type StatsPoint = {
   /** ISO 8601 timestamp of the stats record's created field. */
   timestamp: string;
   /** Mapped system stats for this interval. */
   system: MappedSystemStats;
   /** Per-container stats for this interval (only when includeContainers=true). */
   containers?: ContainerStatsOutput[];
-}
+};
 
 // ---------------------------------------------------------------------------
 // fetchStats — public API
@@ -109,13 +109,11 @@ export async function fetchStats(
   // Reverse to chronological order (oldest→newest).
   const statsRecords = parsedStats.items.slice().reverse();
 
-  // Optionally fetch container_stats for the same window.
-  // container_stats also has `created` → sort -created is valid.
   let containerStatsMap: Map<string, ContainerStatsOutput[]> = new Map();
   if (opts.includeContainers) {
     const ConStatsListSchema = PocketBaseListSchema(ContainerStatsRecordSchema);
 
-    // Same PocketBase space-format datetime requirement as statsFilter above.
+    // Same PocketBase space-format datetime requirement applies here.
     const conFilter = `system="${opts.systemId}" && type="${sinceResult.interval}" && created>="${toPocketBaseDateTime(sinceResult.from)}"`;
     const rawConStats = await client.listRecords("container_stats", {
       filter: conFilter,
@@ -132,7 +130,6 @@ export async function fetchStats(
     }
   }
 
-  // Build points array.
   const points: StatsPoint[] = statsRecords.map((record) => {
     const ts = record.created ?? "";
     const point: StatsPoint = {
